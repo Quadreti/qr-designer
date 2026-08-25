@@ -1,0 +1,1721 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Code Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --creme:#F2EEDF; --panel:#ffffff; --charbon:#2b353e; --charbon-nuit:#1f272e;
+    --terracotta:#e2725b; --terracotta-hover:#cf6450; --terracotta-soft:#f6ded7;
+    --kraft:#CBBD93; --kraft-soft:#f2ecd9; --slate:#4f7396; --slate-soft:#dee9f1;
+    --line:#2b353e1f; --muted:#5c646c; --red:#c0392b; --amber:#d99a2b; --green:#3f8a5a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --creme:#1f272e; --panel:#2b353e; --charbon:#F2EEDF; --charbon-nuit:#F2EEDF;
+      --terracotta:#ef8a72; --terracotta-hover:#f3a48f; --terracotta-soft:#3c2b26;
+      --kraft:#CBBD93; --kraft-soft:#332f22; --slate:#8db3d6; --slate-soft:#233242;
+      --line:#F2EEDF1f; --muted:#b7bec4; --red:#e0685a; --amber:#e3b158; --green:#6fbf8b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --creme:#1f272e; --panel:#2b353e; --charbon:#F2EEDF; --charbon-nuit:#F2EEDF;
+    --terracotta:#ef8a72; --terracotta-hover:#f3a48f; --terracotta-soft:#3c2b26;
+    --kraft:#CBBD93; --kraft-soft:#332f22; --slate:#8db3d6; --slate-soft:#233242;
+    --line:#F2EEDF1f; --muted:#b7bec4; --red:#e0685a; --amber:#e3b158; --green:#6fbf8b;
+  }
+  *{ box-sizing:border-box; }
+  html{ color-scheme:light dark; }
+  body{ margin:0; background:var(--creme); color:var(--charbon); font-family:'Karla',sans-serif; padding:26px 18px 70px; }
+  h1,h2,h3,.label,button{ font-family:'Quicksand',sans-serif; }
+  button{ cursor:pointer; font:inherit; color:inherit; }
+  a{ color:var(--terracotta); }
+  :focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; border-radius:4px; }
+
+  .icon{ width:1em; height:1em; display:inline-block; vertical-align:-0.15em; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+
+  .frame{ max-width:1140px; margin:0 auto; background:var(--panel); border-radius:20px; box-shadow:0 20px 60px #0000001a; overflow:hidden; border:1px solid var(--line); }
+
+  .gate-frame{ max-width:520px; margin:40px auto; background:var(--panel); border-radius:20px; box-shadow:0 20px 60px #0000001a; overflow:hidden; border:1px solid var(--line); padding:34px 32px 30px; }
+  .gate-lineage{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:22px; }
+  .lin-badge{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .lin-sq{ width:38px; height:38px; border-radius:10px; display:grid; place-items:center; font-weight:700; font-size:14px; }
+  .lin-sq.qd{ background:var(--kraft-soft); color:var(--charbon); }
+  .lin-sq.qr{ background:var(--terracotta-soft); color:var(--terracotta); }
+  .lin-badge .lbl{ font-size:9px; font-weight:600; color:var(--muted); text-align:center; }
+  .lin-arrow{ color:var(--muted); font-size:13px; margin-bottom:16px; }
+  .gate-frame h2.gt{ font-size:19px; font-weight:700; text-align:center; margin:0 0 6px; }
+  .gate-frame p.gs{ font-size:12.5px; color:var(--muted); text-align:center; margin:0 0 22px; line-height:1.55; }
+  .gate-tabs{ display:flex; gap:6px; background:var(--kraft-soft); border-radius:11px; padding:4px; margin-bottom:20px; }
+  label.flabel{ font-size:11.5px; font-weight:600; display:block; margin-bottom:6px; }
+  .field{ width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 14px; font-size:13.5px; font-family:'Karla',sans-serif; background:transparent; color:var(--charbon); margin-bottom:13px; }
+  .field:focus-visible{ outline-offset:0; }
+  .otp-field{ text-align:center; letter-spacing:.5em; font-size:18px; font-weight:600; font-family:'Quicksand',sans-serif; }
+  .gate-cta{ width:100%; background:var(--terracotta); color:#fff; border:none; padding:13px; border-radius:11px; font-weight:700; font-size:13.5px; margin-top:4px; }
+  .gate-cta:hover{ background:var(--terracotta-hover); }
+  .gate-cta:disabled{ opacity:.45; pointer-events:none; }
+  .otp-step{ display:none; }
+  .otp-step.on{ display:block; }
+  .otp-sent-note{ font-size:11.5px; color:var(--muted); margin:-6px 0 14px; line-height:1.5; }
+  .otp-sent-note b{ color:var(--charbon); }
+  .otp-back{ display:block; margin:10px auto 0; font-size:11.5px; color:var(--muted); background:none; border:none; text-decoration:underline; }
+  .gate-perks{ display:flex; flex-direction:column; gap:9px; margin:22px 0 18px; padding:16px 16px; background:var(--slate-soft); border-radius:12px; }
+  .gate-perk{ display:flex; gap:9px; align-items:flex-start; font-size:12px; line-height:1.5; }
+  .gate-perk .icon{ flex-shrink:0; margin-top:2px; color:var(--slate); font-size:15px; }
+  .gate-arch-note{ font-size:10.5px; color:var(--muted); text-align:center; line-height:1.5; padding-top:14px; border-top:1px solid var(--line); }
+  .gate-error{ display:none; font-size:11.5px; color:var(--red); background:color-mix(in srgb, var(--red) 10%, transparent); border:1px solid var(--red); border-radius:10px; padding:10px 13px; line-height:1.5; margin-top:12px; }
+  .gate-error.on{ display:block; }
+  .export-status{ display:none; align-items:flex-start; gap:10px; border-radius:10px; padding:12px 14px; font-size:11.5px; line-height:1.5; margin-top:10px; }
+  .export-status.on{ display:flex; }
+  .export-status.err{ color:var(--red); background:color-mix(in srgb, var(--red) 10%, transparent); border:1px solid var(--red); }
+  .export-status.info{ color:var(--charbon); background:var(--slate-soft); border:1px solid var(--line); }
+  .export-status .spinner{ width:18px; height:18px; border-width:2px; flex-shrink:0; margin-top:1px; }
+  .admin-panel{ display:none; padding:18px 26px 22px; border-bottom:1px solid var(--line); background:var(--kraft-soft); border-left:4px solid var(--terracotta); }
+  .admin-panel.on{ display:block; }
+  .admin-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .admin-head h3{ font-size:14px; margin:0; display:flex; align-items:center; gap:8px; }
+  .admin-tag{ font-size:9px; font-weight:700; color:var(--terracotta); background:var(--terracotta-soft); padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+  .admin-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+  .admin-note{ font-size:11px; color:var(--muted); }
+  .admin-list-head{ display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:14px 0 8px; }
+  .admin-list{ display:flex; flex-direction:column; gap:7px; }
+  .admin-client{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 13px; font-size:12px; }
+  .admin-client .mail{ font-weight:600; min-width:180px; word-break:break-all; }
+  .admin-client .etat{ font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+  .admin-client .etat.prem{ background:var(--terracotta-soft); color:var(--terracotta); }
+  .admin-client .etat.dec{ background:var(--slate-soft); color:var(--slate); }
+  .admin-client .compteur{ font-size:11px; color:var(--muted); }
+  .admin-client .actions{ margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; }
+  .admin-client .actions button{ font-size:10.5px; font-weight:700; border:1px solid var(--line); background:none; border-radius:8px; padding:5px 10px; color:var(--charbon); }
+  .admin-client .actions button:hover{ border-color:var(--terracotta); color:var(--terracotta); }
+  .gate-arch-note b{ color:var(--slate); }
+  .unlock-scene{ display:none; }
+  .unlock-scene.on{ display:block; }
+  .relock-link{ font-size:11px; color:var(--muted); background:none; border:none; text-decoration:underline; display:flex; align-items:center; gap:5px; }
+
+  .gate-stage{ display:none; }
+  .gate-stage.on{ display:block; }
+  .shared-note{ display:flex; gap:9px; align-items:flex-start; background:var(--kraft-soft); border-radius:10px; padding:11px 13px; font-size:11px; line-height:1.5; color:var(--charbon); margin-top:16px; }
+  .shared-note .icon{ color:var(--charbon); margin-top:1px; font-size:15px; }
+  .shared-note b{ color:var(--charbon); }
+
+  .tier-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+  .tier-card{ border:2px solid var(--line); border-radius:13px; padding:16px 17px; text-align:left; background:none; display:flex; flex-direction:column; gap:6px; }
+  .tier-card.on{ border-color:var(--terracotta); background:var(--terracotta-soft); }
+  .tier-head{ display:flex; justify-content:space-between; align-items:center; }
+  .tier-name{ font-size:13.5px; font-weight:700; }
+  .tier-price{ font-size:12px; font-weight:700; color:var(--muted); }
+  .tier-card.on .tier-price{ color:var(--terracotta); }
+  .tier-desc{ font-size:11.5px; color:var(--muted); line-height:1.5; }
+  .tier-card.on .tier-desc{ color:var(--charbon); }
+  .discover-tag{ font-size:9px; font-weight:700; color:var(--slate); background:var(--slate-soft); padding:2px 7px; border-radius:20px; text-transform:uppercase; }
+  .premium-tag{ font-size:9px; font-weight:700; color:var(--terracotta); background:#fff; padding:2px 7px; border-radius:20px; text-transform:uppercase; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:18px 26px; border-bottom:1px solid var(--line); gap:12px; flex-wrap:wrap; }
+  .topbar .id{ display:flex; align-items:center; gap:12px; }
+  .badge{ width:34px; height:34px; border-radius:10px; background:var(--terracotta-soft); display:grid; place-items:center; color:var(--terracotta); font-weight:700; font-size:14px; flex-shrink:0; }
+  .topbar h2{ font-size:17px; font-weight:700; margin:0; }
+  .topbar .sub{ font-size:10.5px; color:var(--muted); }
+  .standalone{ font-size:11px; color:var(--slate); background:var(--slate-soft); padding:5px 11px; border-radius:20px; font-weight:600; }
+  .topbar-redirect{ font-size:11px; color:var(--slate); background:var(--slate-soft); border:none; padding:6px 12px; border-radius:20px; font-weight:700; font-family:'Quicksand',sans-serif; display:flex; align-items:center; gap:6px; }
+
+  .tracker{ display:flex; padding:18px 26px 0; gap:4px; overflow-x:auto; }
+  .tstep{ flex:1; min-width:64px; display:flex; flex-direction:column; gap:8px; padding-bottom:14px; border-bottom:3px solid var(--line); }
+  .tstep.active{ border-color:var(--terracotta); }
+  .tstep.done{ border-color:var(--kraft); }
+  .tstep .tn{ display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--muted); width:100%; }
+  .tstep.active .tn{ color:var(--terracotta); }
+  .tstep.done .tn{ color:var(--kraft); }
+  .tcircle{ width:20px; height:20px; border-radius:50%; background:var(--line); display:grid; place-items:center; font-size:10px; color:var(--charbon); flex-shrink:0; }
+  .tstep.active .tcircle{ background:var(--terracotta); color:#fff; }
+  .tstep.done .tcircle{ background:var(--kraft); color:#fff; }
+  .tstep button{ background:none; border:none; text-align:left; padding:0; font-family:'Karla',sans-serif; }
+
+  .body{ display:grid; grid-template-columns:1.15fr 1fr; min-height:480px; }
+  .panel-left{ padding:26px 30px 30px; border-right:1px solid var(--line); max-height:680px; overflow-y:auto; }
+  .panel-right{ padding:26px 30px; background:var(--kraft-soft); display:flex; flex-direction:column; position:sticky; top:0; align-self:flex-start; }
+
+  .screen{ display:none; }
+  .screen.on{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  @media (prefers-reduced-motion:reduce){ .screen.on{ animation:none; } }
+
+  h3.stitle{ font-size:15.5px; font-weight:700; margin:0 0 6px; }
+  .shint{ font-size:12px; color:var(--muted); margin:0 0 18px; line-height:1.55; }
+
+  .dropzone{ border:2px dashed var(--line); border-radius:14px; padding:40px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; background:none; width:100%; color:inherit; }
+  .dropzone:hover{ border-color:var(--terracotta); }
+  .dropzone .ico{ width:44px; height:44px; border-radius:50%; background:var(--terracotta-soft); display:grid; place-items:center; font-size:19px; color:var(--terracotta); }
+  .dropzone .main{ font-size:13.5px; font-weight:600; }
+  .dropzone .sub{ font-size:11.5px; color:var(--muted); }
+  .uploaded{ display:none; align-items:center; gap:14px; border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .uploaded.on{ display:flex; }
+  .thumb{ width:52px; height:52px; border-radius:10px; background:linear-gradient(135deg,var(--terracotta),var(--kraft),var(--slate)); flex-shrink:0; background-size:cover; background-position:center; }
+  .uploaded .name{ font-size:13px; font-weight:600; word-break:break-all; }
+  .uploaded .swap{ margin-left:auto; font-size:11.5px; color:var(--terracotta); background:none; border:none; font-weight:700; flex-shrink:0; }
+
+  .type-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:16px; }
+  .type-chip{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 14px; border-radius:12px; border:1.5px solid var(--line); background:none; font-size:10.5px; font-weight:600; color:var(--muted); flex-shrink:0; min-width:64px; }
+  .type-chip.on{ border-color:var(--terracotta); color:var(--terracotta); background:var(--terracotta-soft); }
+  .type-chip .icon{ font-size:17px; }
+  label.flabel{ font-size:11.5px; font-weight:600; display:block; margin-bottom:6px; }
+  .hint-box{ display:flex; gap:8px; align-items:flex-start; background:var(--slate-soft); border-radius:10px; padding:11px 14px; margin-top:4px; font-size:11.5px; color:var(--charbon); line-height:1.5; }
+  .hint-box .icon{ color:var(--slate); margin-top:1px; }
+  .hint-box b{ color:var(--slate); }
+  .dest-form{ display:none; }
+  .dest-form.on{ display:block; }
+  .upload-mini{ border:2px dashed var(--line); border-radius:12px; padding:16px; text-align:center; font-size:11px; color:var(--muted); margin-bottom:12px; background:none; width:100%; }
+  .upload-mini a, .upload-mini button.linklike{ color:var(--terracotta); font-weight:600; background:none; border:none; padding:0; font:inherit; text-decoration:underline; }
+
+  .accordion{ border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; }
+  .acc-head{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:none; border:none; font-size:13px; font-weight:600; text-align:left; }
+  .acc-head .l{ display:flex; align-items:center; gap:8px; }
+  .acc-head .chev{ transition:transform .2s; color:var(--muted); }
+  @media (prefers-reduced-motion:reduce){ .acc-head .chev{ transition:none; } }
+  .accordion.open .acc-head .chev{ transform:rotate(90deg); }
+  .acc-body{ display:none; padding:0 16px 18px; }
+  .accordion.open .acc-body{ display:block; }
+  .new-tag{ font-size:9.5px; font-weight:700; color:var(--terracotta); background:var(--terracotta-soft); padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.03em; }
+
+  .sg-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:14px 0 9px; }
+  .sg-label:first-child{ margin-top:0; }
+  .opt-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .opt-card{ border:2px solid var(--line); border-radius:10px; padding:7px; text-align:center; background:none; width:64px; color:inherit; }
+  .opt-card.on{ border-color:var(--terracotta); }
+  .opt-swatch{ height:36px; border-radius:6px; margin-bottom:5px; display:grid; place-items:center; color:var(--charbon); }
+  .opt-card .name{ font-size:9.5px; font-weight:600; line-height:1.25; }
+  .sw-photo{ background:linear-gradient(135deg,var(--terracotta) 0 33%,var(--charbon) 33% 66%,var(--kraft) 66% 100%); }
+  .sw-poster{ background:conic-gradient(var(--charbon) 0 25%,var(--terracotta) 0 50%,var(--kraft) 0 75%,var(--slate) 0 100%); }
+  .sw-points{ background-image:radial-gradient(var(--charbon) 30%,transparent 32%); background-size:7px 7px; background-color:var(--kraft-soft); }
+  .sw-aplats{ background-color:var(--charbon); }
+  .sw-traits{ background-image:repeating-linear-gradient(0deg,var(--charbon) 0 2px,transparent 2px 5px); background-color:var(--kraft-soft); }
+  .sw-squircle{ background:var(--kraft-soft); }
+  .sw-squircle .icon{ width:20px; height:20px; }
+  .sw-marker{ background:var(--kraft-soft); }
+  .sw-marker .icon{ width:20px; height:20px; color:var(--charbon); }
+
+  .color-tabs{ display:flex; gap:6px; margin-bottom:12px; }
+  .ctab{ flex:1; padding:8px; border-radius:8px; border:1px solid var(--line); background:none; font-size:11.5px; font-weight:600; color:var(--muted); }
+  .ctab.on{ background:var(--charbon); color:var(--creme); border-color:var(--charbon); }
+  .swatch-grid{ display:flex; gap:7px; flex-wrap:wrap; }
+  .sw{ width:26px; height:26px; border-radius:7px; border:2px solid transparent; padding:0; }
+  .sw.on{ border-color:var(--charbon); }
+
+  .icon-lib-head{ display:flex; gap:8px; margin-bottom:12px; }
+  .libtab{ flex:1; padding:9px; border-radius:8px; border:1px solid var(--line); background:none; font-size:11.5px; font-weight:600; }
+  .libtab.on{ background:var(--terracotta-soft); border-color:var(--terracotta); color:var(--terracotta); }
+  .icon-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
+  .icon-cell{ aspect-ratio:1; border-radius:9px; border:1px solid var(--line); display:grid; place-items:center; font-size:15px; background:var(--kraft-soft); color:var(--charbon); }
+  .icon-cell.on{ border-color:var(--terracotta); border-width:2px; color:var(--terracotta); }
+
+  .family-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:20px; }
+  .family-card{ border:2px solid var(--line); border-radius:12px; padding:14px 10px; text-align:center; background:none; display:flex; flex-direction:column; align-items:center; gap:7px; color:inherit; }
+  .family-card.on{ border-color:var(--terracotta); background:var(--terracotta-soft); }
+  .family-card .icon{ font-size:19px; width:20px; height:20px; }
+  .family-card .name{ font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:5px; }
+  .family-card .desc{ font-size:9.5px; color:var(--muted); line-height:1.35; }
+  .family-card.on .desc{ color:var(--charbon); }
+  .modern-tag{ font-size:9px; font-weight:700; color:var(--slate); background:var(--slate-soft); padding:1px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.03em; }
+
+  .art-panel{ display:none; }
+  .art-panel.on{ display:block; }
+  .art-photo-lock{ display:flex; gap:10px; align-items:center; background:var(--slate-soft); border-radius:10px; padding:11px 14px; font-size:11.5px; line-height:1.5; color:var(--charbon); margin-bottom:16px; }
+  .art-photo-lock .thumb{ width:34px; height:34px; border-radius:8px; flex-shrink:0; }
+  .art-examples{ display:flex; gap:9px; overflow-x:auto; padding-bottom:6px; margin-bottom:16px; }
+  .art-ex{ flex-shrink:0; width:76px; }
+  .art-ex .pair{ display:flex; height:52px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .art-ex .pair > div{ flex:1; }
+  .art-ex .name{ font-size:9px; color:var(--muted); margin-top:4px; text-align:center; }
+  .art-prompt{ width:100%; border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-size:13px; font-family:'Karla',sans-serif; background:transparent; color:var(--charbon); resize:vertical; min-height:70px; margin-bottom:14px; }
+  .surprise-row{ display:flex; justify-content:flex-end; margin:-8px 0 14px; }
+  .surprise-btn{ font-size:11px; font-weight:700; color:var(--terracotta); background:var(--terracotta-soft); border:none; padding:6px 12px; border-radius:20px; display:inline-flex; align-items:center; gap:6px; }
+
+  .tmpl-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:16px; }
+  .tmpl-card{ border:2px solid var(--line); border-radius:10px; padding:6px; background:none; }
+  .tmpl-card.on{ border-color:var(--terracotta); }
+  .tmpl-swatch{ aspect-ratio:1; border-radius:6px; }
+
+  .export-summary{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:16px; }
+  .export-summary h3{ font-size:15px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+  .export-summary h3 .icon{ color:var(--green); }
+  .export-summary p{ font-size:12px; color:var(--muted); line-height:1.6; margin:0 0 16px; }
+  .cgu-row{ display:flex; gap:8px; align-items:flex-start; font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:16px; cursor:pointer; }
+  .cgu-row input{ margin-top:2px; flex-shrink:0; accent-color:var(--terracotta); }
+  .cgu-row a{ font-weight:600; text-decoration:underline; }
+  .subcontractor-note{ display:flex; gap:9px; align-items:flex-start; background:var(--amber-soft,var(--slate-soft)); border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-size:11px; line-height:1.55; color:var(--charbon); margin-bottom:16px; }
+  .subcontractor-note b{ color:var(--charbon); }
+  .subcontractor-note .draft-flag{ display:block; margin-top:5px; font-size:10px; color:var(--muted); font-style:italic; }
+  .export-actions{ display:flex; flex-direction:column; gap:9px; }
+  .handoff{ background:var(--slate-soft); border-radius:12px; padding:16px 18px; text-align:left; font-size:12px; line-height:1.6; color:var(--charbon); margin-top:20px; }
+  .handoff b{ color:var(--slate); }
+  .redirect-btn{ display:flex; align-items:center; gap:7px; margin-top:12px; background:var(--panel); color:var(--slate); border:1.5px solid var(--slate); padding:9px 14px; border-radius:9px; font-size:12px; font-weight:700; font-family:'Quicksand',sans-serif; }
+
+  .legal-footer{ display:flex; justify-content:center; gap:18px; margin-top:8px; flex-wrap:wrap; }
+  .legal-footer a{ font-size:10.5px; color:var(--muted); text-decoration:none; }
+  .legal-footer a:hover{ text-decoration:underline; }
+
+  .qr-stage{ background:var(--panel); border-radius:16px; padding:20px; flex:1; display:flex; align-items:center; justify-content:center; margin-bottom:14px; box-shadow:0 6px 20px #0000000f; min-height:220px; }
+  #draftCanvas{ width:100%; max-width:250px; aspect-ratio:1; image-rendering:pixelated; }
+  .draft-caption{ font-size:10.5px; color:var(--muted); text-align:center; margin:-6px 0 14px; line-height:1.5; }
+  .draft-caption b{ color:var(--charbon); }
+
+  .preview-block{ display:none; }
+  .preview-block.on{ display:block; }
+  .loading-stage{ background:var(--panel); border-radius:16px; padding:20px; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; box-shadow:0 6px 20px #0000000f; margin-bottom:18px; }
+  .spinner{ width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--slate); animation:spin 1s linear infinite; }
+  @media (prefers-reduced-motion:reduce){ .spinner{ animation:none; border-top-color:var(--line); } }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loading-stage .lbl{ font-size:12px; font-weight:600; color:var(--muted); text-align:center; }
+  .loading-note{ background:var(--panel); border-radius:14px; padding:14px 16px; font-size:11.5px; color:var(--muted); line-height:1.6; }
+  .loading-note b{ color:var(--slate); }
+
+  .gauge-card{ background:var(--panel); border-radius:14px; padding:16px 18px; }
+  .gauge-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
+  .gauge-label{ font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .gauge-value{ font-size:12.5px; font-weight:700; }
+  .gauge-track{ height:7px; border-radius:5px; background:linear-gradient(90deg,var(--red),var(--amber) 50%,var(--green)); position:relative; }
+  .gauge-marker{ position:absolute; top:-4px; width:15px; height:15px; border-radius:50%; background:var(--panel); border:3px solid var(--charbon); transform:translateX(-50%); transition:left .3s ease; }
+  @media (prefers-reduced-motion:reduce){ .gauge-marker{ transition:none; } }
+  .gauge-note{ font-size:11px; color:var(--muted); margin-top:9px; line-height:1.5; }
+
+  .navrow{ display:flex; justify-content:space-between; padding:18px 30px; border-top:1px solid var(--line); }
+  .btn{ border:none; padding:11px 22px; border-radius:10px; font-weight:700; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+  .btn.primary{ background:var(--terracotta); color:#fff; }
+  .btn.primary:hover{ background:var(--terracotta-hover); }
+  .btn.ghost{ background:none; color:var(--muted); }
+  .btn.ghost:hover{ color:var(--charbon); }
+  .btn.outline{ background:none; border:1.5px solid var(--line); color:var(--charbon); }
+  .btn.outline:hover{ border-color:var(--terracotta); color:var(--terracotta); }
+  .btn:disabled{ opacity:.4; pointer-events:none; }
+  .btn-note{ font-size:10.5px; color:var(--muted); text-align:center; line-height:1.5; margin-top:-2px; }
+
+  .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  @media (max-width:760px){
+    .body{ grid-template-columns:1fr; }
+    .panel-left{ border-right:none; border-bottom:1px solid var(--line); max-height:none; }
+    .panel-right{ position:static; }
+    .tracker{ overflow-x:auto; }
+    .tstep .tn span:last-child{ display:none; }
+  }
+  @media (max-width:420px){
+    body{ padding:14px 8px 50px; }
+    .gate-frame{ padding:26px 18px 22px; margin:16px auto; }
+    .panel-left, .panel-right{ padding:18px 16px 22px; }
+    .topbar{ padding:14px 16px; }
+    .navrow{ padding:14px 16px; }
+    .family-row{ grid-template-columns:1fr; }
+    .icon-grid{ grid-template-columns:repeat(5,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<svg class="visually-hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 20 0"/><path d="M5.5 12a10 10 0 0 1 13 0"/><path d="M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L7 19"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.3" cy="8.3" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="8.3" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.3" cy="15.7" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="15.7" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M9 6h9v9"/><path d="M18 6L7 17"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.2 2.8 3-.6 1.1 2.9 2.9 1.1-.6 3 2.8 1.2-2.8 1.2.6 3-2.9 1.1-1.1 2.9-3-.6L12 21.5l-1.2-2.8-3 .6-1.1-2.9-2.9-1.1.6-3L1.6 12l2.8-1.2-.6-3 2.9-1.1 1.1-2.9 3 .6z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 3v4h-4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-.9 2-2 0-.6-.3-1-.6-1.4-.3-.4-.4-.9-.1-1.3.3-.4.9-.5 1.5-.5H17a3 3 0 0 0 3-3c0-5-3.6-9.8-8-9.8z"/><circle cx="8" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="10.5" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-squircle" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="6"/></symbol>
+    <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></symbol>
+    <symbol id="i-square" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/></symbol>
+    <symbol id="i-hexagon" viewBox="0 0 24 24"><path d="M8 3.5h8L20.5 12 16 20.5H8L3.5 12z"/></symbol>
+    <symbol id="i-dotted" viewBox="0 0 24 24"><circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.9" cy="7.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.9" cy="16.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="5.1" cy="16.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="5.1" cy="7.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-lines" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.7C1.2 8 2.7 5 6 5c2 0 3.4 1.2 4 2.4C10.6 6.2 12 5 14 5c3.3 0 4.8 3 3.3 6.3C19 15.6 12 20 12 20z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="i-diamond" viewBox="0 0 24 24"><path d="M12 3l7 6-7 12-7-12z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.6-4.1 6.1-.6z"/></symbol>
+    <symbol id="i-house" viewBox="0 0 24 24"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="10" rx="1"/><path d="M4 13h16M12 9v10"/><path d="M12 9c-1.5-3-5-3.5-5-1s3 1.6 5 1zm0 0c1.5-3 5-3.5 5-1s-3 1.6-5 1z"/></symbol>
+    <symbol id="i-cake" viewBox="0 0 24 24"><path d="M4 20v-6a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v6"/><path d="M4 17h16M9 10V7M15 10V7"/></symbol>
+    <symbol id="i-flower" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="6" r="2.4"/><circle cx="17" cy="9.5" r="2.4"/><circle cx="17" cy="15" r="2.4"/><circle cx="12" cy="18" r="2.4"/><circle cx="7" cy="15" r="2.4"/><circle cx="7" cy="9.5" r="2.4"/></symbol>
+    <symbol id="i-bird" viewBox="0 0 24 24"><path d="M4 12c2-4 6-6 10-5 2 .3 4 1.6 5 3.5-1 .3-2 .2-2.8-.3.4 1.2.2 2.4-.6 3.3-1.6 2-4.5 2.5-7.1 1.5"/><circle cx="16.5" cy="8.8" r=".6" fill="currentColor" stroke="none"/><path d="M5 15c1.5 2 4 3 7 3"/></symbol>
+  </defs>
+</svg>
+
+<input type="file" id="filePicker" accept="image/*" class="visually-hidden" tabindex="-1">
+<input type="file" id="filePickerMulti" accept="image/*" multiple class="visually-hidden" tabindex="-1">
+
+<!-- GATE -->
+<div class="gate-frame" id="gateFrame">
+  <div class="gate-lineage">
+    <div class="lin-badge"><div class="lin-sq qd">QD</div><div class="lbl">Quadreti<br>Designer</div></div>
+    <div class="lin-arrow" aria-hidden="true">&rarr;</div>
+    <div class="lin-badge"><div class="lin-sq qr">QR</div><div class="lbl">QR Code<br>Designer</div></div>
+  </div>
+
+  <!-- STAGE A: connexion compte partagé, code par e-mail (identique au mécanisme de Quadreti Designer) -->
+  <div class="gate-stage on" id="gateLogin">
+    <h2 class="gt">Connecte-toi</h2>
+    <p class="gs">Un seul compte pour toute la famille Quadreti — si tu as déjà un compte Quadreti Designer, c'est le même.</p>
+
+    <div class="otp-step on" id="otpStepEmail">
+      <label class="flabel" for="loginEmail">Adresse e-mail</label>
+      <input class="field" id="loginEmail" type="email" autocomplete="email" placeholder="toi@exemple.fr">
+      <button class="gate-cta" id="sendCodeBtn" onclick="sendCode()" disabled>Envoyer un code</button>
+    </div>
+
+    <div class="otp-step" id="otpStepCode">
+      <p class="otp-sent-note">Code envoyé à <b id="otpEmailEcho"></b> — valable 10 minutes.</p>
+      <label class="flabel" for="loginCode">Code reçu par e-mail</label>
+      <input class="field otp-field" id="loginCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="&middot;&middot;&middot;&middot;&middot;&middot;">
+      <button class="gate-cta" id="validateCodeBtn" onclick="validateCode()" disabled>Valider le code</button>
+      <button class="otp-back" onclick="backToEmail()">&larr; changer d'adresse e-mail</button>
+    </div>
+
+    <div class="gate-error" id="gateError" role="alert"></div>
+
+    <div class="shared-note"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg> <div><b>Identité partagée, outils séparés</b> — la connexion utilise le même compte que Quadreti Designer, mais aucune donnée de génération n'est échangée entre les deux : ce n'est que l'accès qui est commun.</div></div>
+    <div class="legal-footer" style="margin-top:16px"><a href="#">CGU</a><a href="#">Confidentialité</a><a href="https://quadreti.fr" target="_blank" rel="noopener">Retour à quadreti.fr <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg></a></div>
+  </div>
+
+  <!-- STAGE B: palier d'accès (découverte / premium), propre à cet outil — statut lu en base, pas un choix libre -->
+  <div class="gate-stage" id="gateAccess">
+    <h2 class="gt">Ton accès QR Code Designer</h2>
+    <p class="gs" id="gateAccessSub">Connecté(e) — voici ton palier actuel pour cet outil précis.</p>
+    <div class="tier-row" aria-label="Palier d'accès">
+      <div class="tier-card" id="tierCardDecouverte">
+        <div class="tier-head"><span class="tier-name">Découverte <span class="discover-tag">gratuit</span></span><span class="tier-price">0&euro;</span></div>
+        <div class="tier-desc">Parcours complet, brouillon local illimité — pour se faire une idée avant d'acheter. La génération réelle n'est pas disponible sur ce palier.</div>
+      </div>
+      <div class="tier-card" id="tierCardPremium">
+        <div class="tier-head"><span class="tier-name">Premium <span class="premium-tag">déblocage</span></span><span class="tier-price" id="tierPremiumEtat">non activé</span></div>
+        <div class="tier-desc">Débloque la génération réelle haute résolution et le mode Artistique IA — même logique de déblocage que l'export HD sur Quadreti Designer. Activation par l'équipe Quadreti (achat / code) — pas encore automatisée.</div>
+      </div>
+    </div>
+    <button class="gate-cta" onclick="unlockApp()">Continuer</button>
+    <div class="gate-arch-note">Palier <b>propre à QR Code Designer</b> — ton statut d'achat sur Quadreti Designer n'active rien ici automatiquement.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="frame unlock-scene" id="appFrame">
+  <div class="topbar">
+    <div class="id">
+      <div class="badge" aria-hidden="true">Q</div>
+      <div><h2>QR Code Designer</h2><div class="sub">Le cousin de Quadreti Designer</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+      <div class="standalone" id="tierPill">Découverte</div>
+      <button class="topbar-redirect admin-only" id="adminGearBtn" style="display:none" onclick="toggleAdminPanel()"><svg class="icon" aria-hidden="true"><use href="#i-gear"></use></svg> Réglages admin</button>
+      <button class="topbar-redirect" onclick="window.open('https://designer.quadreti.fr','_blank')"><svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg> Quadreti Designer</button>
+      <button class="relock-link" onclick="relock()"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg> revoir le verrouillage</button>
+    </div>
+  </div>
+
+  <!-- PANNEAU ADMIN : visible uniquement quand l'e-mail connecté est dans la table admins -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-head">
+      <h3><svg class="icon" aria-hidden="true"><use href="#i-gear"></use></svg> Réglages QR Code Designer</h3>
+      <span class="admin-tag">réservé admin</span>
+    </div>
+    <div class="admin-row">
+      <label class="flabel" for="quotaInput" style="margin:0">Générations réelles incluses par client Premium</label>
+      <input class="field" id="quotaInput" type="number" min="0" max="999" style="width:90px;margin:0" value="1">
+      <button class="btn primary" style="padding:9px 16px" onclick="saveQuota()">Enregistrer</button>
+      <span class="admin-note" id="quotaSaveNote"></span>
+    </div>
+    <div class="admin-row" style="align-items:flex-end">
+      <div style="flex:1;min-width:200px">
+        <label class="flabel" for="newClientEmail">Activer un client en Premium</label>
+        <input class="field" id="newClientEmail" type="email" placeholder="client@exemple.fr" style="margin:0">
+      </div>
+      <button class="btn primary" style="padding:9px 16px" onclick="addClientPremium()">Activer</button>
+    </div>
+    <div class="admin-list-head">
+      <span>Clients</span>
+      <button class="relock-link" onclick="loadAdminClients()"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg> actualiser</button>
+    </div>
+    <div id="adminClientList" class="admin-list"></div>
+    <div class="admin-note" id="adminPanelNote"></div>
+  </div>
+
+  <div class="tracker" role="tablist" aria-label="Étapes">
+    <div class="tstep active" data-step="1"><button class="tn" role="tab" aria-selected="true"><span class="tcircle">1</span><span>Photo</span></button></div>
+    <div class="tstep" data-step="2"><button class="tn" role="tab" aria-selected="false"><span class="tcircle">2</span><span>Destination</span></button></div>
+    <div class="tstep" data-step="3"><button class="tn" role="tab" aria-selected="false"><span class="tcircle">3</span><span>Modèles</span></button></div>
+    <div class="tstep" data-step="4"><button class="tn" role="tab" aria-selected="false"><span class="tcircle">4</span><span>Style</span></button></div>
+    <div class="tstep" data-step="5"><button class="tn" role="tab" aria-selected="false"><span class="tcircle">5</span><span>Export</span></button></div>
+  </div>
+
+  <div class="body">
+    <div class="panel-left">
+
+      <!-- STEP 1: PHOTO -->
+      <div class="screen on" id="s1">
+        <h3 class="stitle">Ta photo</h3>
+        <p class="shint">Elle reste la matière de départ de tout le parcours — la jauge à droite indique tout de suite si elle se prête bien à l'exercice.</p>
+        <button type="button" class="dropzone" id="dz" onclick="document.getElementById('filePicker').click()">
+          <div class="ico"><svg class="icon" style="width:22px;height:22px" aria-hidden="true"><use href="#i-camera"></use></svg></div>
+          <div class="main">Dépose un fichier ou clique pour choisir</div>
+          <div class="sub">JPEG, PNG — haute résolution recommandée</div>
+        </button>
+        <div class="uploaded" id="uploadedBox">
+          <div class="thumb" id="uploadedThumb"></div>
+          <div><div class="name" id="uploadedName"></div><div class="sub" style="font-size:11px;color:var(--muted)" id="uploadedMeta"></div></div>
+          <button class="swap" onclick="resetPhoto()">changer</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: DESTINATION -->
+      <div class="screen" id="s2">
+        <h3 class="stitle">Où le QR doit mener</h3>
+        <p class="shint">Chaque type propose ses propres champs — pas juste un lien pour tout.</p>
+        <div class="type-row" role="radiogroup" aria-label="Type de destination">
+          <button class="type-chip on" role="radio" aria-checked="true" onclick="setDest(this,'youtube')"><svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>YouTube</button>
+          <button class="type-chip" role="radio" aria-checked="false" onclick="setDest(this,'wifi')"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>WiFi</button>
+          <button class="type-chip" role="radio" aria-checked="false" onclick="setDest(this,'msg')"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>Message</button>
+          <button class="type-chip" role="radio" aria-checked="false" onclick="setDest(this,'photo')"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>Photo</button>
+        </div>
+
+        <div class="dest-form on" id="dest-youtube">
+          <label class="flabel" for="destYoutube">Lien de la vidéo</label>
+          <input class="field" id="destYoutube" type="url" placeholder="https://youtu.be/..." oninput="onDestInput()">
+          <div class="hint-box"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg> <div><b>Lien raccourci disponible</b> — deviendrait <code>quadreti.fr/q1</code>, pour un QR moins dense. Réglé au branchement du backend.</div></div>
+        </div>
+        <div class="dest-form" id="dest-wifi">
+          <label class="flabel" for="destSsid">Nom du réseau (SSID)</label>
+          <input class="field" id="destSsid" placeholder="MonReseauWiFi" oninput="onDestInput()">
+          <label class="flabel" for="destWifiPass">Mot de passe</label>
+          <input class="field" id="destWifiPass" type="password" placeholder="Saisis le mot de passe" oninput="onDestInput()">
+        </div>
+        <div class="dest-form" id="dest-msg">
+          <label class="flabel" for="destMsg">Message à afficher au scan</label>
+          <input class="field" id="destMsg" placeholder="Merci d'avoir scanné !" oninput="onDestInput()">
+        </div>
+        <div class="dest-form" id="dest-photo">
+          <label class="flabel" for="destGalleryBtn">Galerie de photos</label>
+          <button type="button" class="upload-mini" id="destGalleryBtn" onclick="document.getElementById('filePickerMulti').click()">Dépose plusieurs photos ou <span class="linklike" style="text-decoration:underline;color:var(--terracotta);font-weight:600">clique pour choisir un album</span></button>
+          <div class="sub" id="galleryCount" style="font-size:11px;color:var(--muted)"></div>
+        </div>
+      </div>
+
+      <!-- STEP 3: MODELES -->
+      <div class="screen" id="s3">
+        <h3 class="stitle">Un modèle pour démarrer</h3>
+        <p class="shint">Optionnel — un point de départ à ajuster ensuite dans Style. « Surprends-moi » tire un modèle aléatoire.</p>
+        <div class="surprise-row"><button class="surprise-btn" onclick="surpriseMe()"><svg class="icon" aria-hidden="true"><use href="#i-dice"></use></svg> Surprends-moi</button></div>
+        <div class="tmpl-grid" id="tmplGrid" role="radiogroup" aria-label="Modèle"></div>
+      </div>
+
+      <!-- STEP 4: STYLE -->
+      <div class="screen" id="s4">
+        <h3 class="stitle">Style, en détail</h3>
+        <p class="shint">Trois façons de styliser — le point commun : ta photo reste toujours la matière de départ.</p>
+
+        <div class="family-row" role="radiogroup" aria-label="Famille de style">
+          <button class="family-card on" role="radio" aria-checked="true" onclick="setFamily(this,'standard')"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg><span class="name">Personnalisé</span><span class="desc">Couleurs et formes réglées à la main</span></button>
+          <button class="family-card" role="radio" aria-checked="false" onclick="setFamily(this,'standard','image')"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span class="name">Image</span><span class="desc">Ta photo en fond, modules par-dessus</span></button>
+          <button class="family-card" role="radio" aria-checked="false" onclick="setFamily(this,'artistic')"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span class="name">Artistique <span class="modern-tag">IA</span></span><span class="desc">Ta photo restylée par IA</span></button>
+        </div>
+
+        <div id="family-standard" class="art-panel on">
+        <div class="accordion open">
+          <button class="acc-head" onclick="toggleAcc(this)"><span class="l">Forme des modules</span><svg class="icon chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+          <div class="acc-body">
+            <div class="sg-label">Couleur des modules</div>
+            <div class="opt-row" role="radiogroup" aria-label="Source de couleur">
+              <button class="opt-card on" role="radio" aria-checked="true" onclick="pickModuleColor(this,'photo')"><div class="opt-swatch sw-photo"></div><div class="name">Photo</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickModuleColor(this,'poster')"><div class="opt-swatch sw-poster"></div><div class="name">Poster</div></button>
+            </div>
+            <div class="sg-label">Forme</div>
+            <div class="opt-row" role="radiogroup" aria-label="Forme des modules">
+              <button class="opt-card on" role="radio" aria-checked="true" onclick="pickShape(this,'points')"><div class="opt-swatch sw-points"></div><div class="name">Points</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickShape(this,'squircle')"><div class="opt-swatch sw-squircle"><svg class="icon" aria-hidden="true"><use href="#i-squircle"></use></svg></div><div class="name">Arrondi</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickShape(this,'aplats')"><div class="opt-swatch sw-aplats"></div><div class="name">Aplats</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickShape(this,'traits')"><div class="opt-swatch sw-traits"></div><div class="name">Traits</div></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="acc-head" onclick="toggleAcc(this)"><span class="l">Forme des marqueurs <span class="new-tag">enrichi</span></span><svg class="icon chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+          <div class="acc-body">
+            <div class="sg-label">Bordure du marqueur</div>
+            <div class="opt-row" role="radiogroup" aria-label="Bordure du marqueur">
+              <button class="opt-card on" role="radio" aria-checked="true" onclick="pickMarkerBorder(this,'square')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-square"></use></svg></div><div class="name">Carré</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerBorder(this,'circle')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-circle"></use></svg></div><div class="name">Cercle</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerBorder(this,'hexagon')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-hexagon"></use></svg></div><div class="name">Hexagone</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerBorder(this,'dotted')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-dotted"></use></svg></div><div class="name">Pointillé</div></button>
+            </div>
+            <div class="sg-label">Centre du marqueur</div>
+            <div class="opt-row" role="radiogroup" aria-label="Centre du marqueur">
+              <button class="opt-card on" role="radio" aria-checked="true" onclick="pickMarkerCenter(this,'square')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-square"></use></svg></div><div class="name">Carré</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerCenter(this,'circle')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-circle"></use></svg></div><div class="name">Cercle</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerCenter(this,'heart')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg></div><div class="name">Cœur</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerCenter(this,'eye')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></div><div class="name">Œil</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerCenter(this,'diamond')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-diamond"></use></svg></div><div class="name">Diamant</div></button>
+              <button class="opt-card" role="radio" aria-checked="false" onclick="pickMarkerCenter(this,'star')"><div class="opt-swatch sw-marker"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg></div><div class="name">Étoile</div></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="acc-head" onclick="toggleAcc(this)"><span class="l">Couleur</span><svg class="icon chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+          <div class="acc-body">
+            <div class="color-tabs" role="radiogroup" aria-label="Type de couleur">
+              <button class="ctab on" role="radio" aria-checked="true" onclick="pickColorMode(this,'solid')">Uni</button>
+              <button class="ctab" role="radio" aria-checked="false" onclick="pickColorMode(this,'linear')">Dégradé</button>
+              <button class="ctab" role="radio" aria-checked="false" onclick="pickColorMode(this,'radial')">Radial</button>
+            </div>
+            <div class="swatch-grid" id="colorSwatchGrid" role="radiogroup" aria-label="Palette"></div>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="acc-head" onclick="toggleAcc(this)"><span class="l">Logo &amp; texte <span class="new-tag">nouveau</span></span><svg class="icon chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+          <div class="acc-body">
+            <div class="icon-lib-head">
+              <button class="libtab on">Bibliothèque</button>
+              <button class="libtab">Importer le mien</button>
+            </div>
+            <div class="icon-grid" id="logoIconGrid" role="radiogroup" aria-label="Icône de logo"></div>
+            <div class="hint-box" style="margin-top:12px"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg> <div>Zone réservée limitée à <b>~8% de la surface</b> — mesuré empiriquement pour rester fiable au scan.</div></div>
+          </div>
+        </div>
+        </div>
+
+        <div id="family-artistic" class="art-panel">
+          <div class="art-photo-lock"><div class="thumb" id="artThumb"></div><div><b id="artPhotoName">ta photo</b> reste la base de la génération — l'IA restylise ta photo, elle n'en invente pas une nouvelle.</div></div>
+          <div class="sg-label">Exemples de restylisation</div>
+          <div class="art-examples">
+            <div class="art-ex"><div class="pair"><div style="background:linear-gradient(135deg,var(--charbon),var(--kraft))"></div><div style="background:repeating-linear-gradient(45deg,var(--charbon) 0 3px,var(--kraft) 3px 6px)"></div></div><div class="name">Aquarelle</div></div>
+            <div class="art-ex"><div class="pair"><div style="background:linear-gradient(135deg,var(--terracotta),var(--slate))"></div><div style="background-image:radial-gradient(var(--terracotta) 30%,transparent 32%);background-size:6px 6px;background-color:var(--slate-soft)"></div></div><div class="name">Pointillisme</div></div>
+            <div class="art-ex"><div class="pair"><div style="background:conic-gradient(var(--charbon),var(--terracotta),var(--kraft))"></div><div style="background:linear-gradient(120deg,var(--charbon) 0 20%,var(--terracotta) 20% 40%,var(--kraft) 40% 60%,var(--slate) 60% 80%,var(--charbon) 80%)"></div></div><div class="name">Vitrail</div></div>
+          </div>
+          <label class="sg-label" for="artPrompt">Décris le style voulu</label>
+          <textarea class="art-prompt" id="artPrompt" placeholder="Ex. : restylise ma photo en aquarelle douce, tons terracotta et kraft…"></textarea>
+          <button class="btn primary" style="width:100%" onclick="generateArt()"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg> Générer le style</button>
+          <p class="btn-note">Aperçu factice pour l'instant — la vraie restylisation IA appellera l'API une fois branchée (prochaine étape du chantier).</p>
+        </div>
+      </div>
+
+      <!-- STEP 5: EXPORT -->
+      <div class="screen" id="s5">
+        <div class="export-summary">
+          <h3><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg> Prêt pour l'export</h3>
+          <p>Le fichier final sera généré une seule fois par l'API, en haute résolution, et vérifié par un vrai scan avant de te revenir. Le brouillon ci-contre reste approximatif — seul le serveur produit le fichier réel.</p>
+
+          <div class="subcontractor-note"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg> <div><b>Ta photo est transmise à qrcode-ai.com</b>, un prestataire externe, pour générer ton QR artistique en haute résolution.<span class="draft-flag">Texte provisoire — la version définitive sera rédigée avec le fil Administratif &amp; Stratégie.</span></div></div>
+
+          <label class="cgu-row"><input type="checkbox" id="cguCheck"><span>J'ai lu et j'accepte les <a href="#">CGU</a> et la transmission de ma photo à qrcode-ai.com décrite ci-dessus.</span></label>
+
+          <div class="export-actions">
+            <button class="btn primary" id="realExportBtn" disabled onclick="callRealGeneration()">Générer via l'API</button>
+            <div class="export-status" id="exportStatus"></div>
+            <div id="realResult" style="display:none">
+              <div class="qr-stage" style="min-height:0;padding:16px;margin:10px 0">
+                <img id="realResultImg" alt="QR code final généré" style="max-width:250px;width:100%;border-radius:10px">
+              </div>
+              <button class="btn primary" style="width:100%" onclick="downloadRealResult()">Télécharger le QR final (PNG haute résolution)</button>
+            </div>
+            <button class="btn outline" onclick="downloadDraft()"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg> Télécharger l'aperçu (PNG, non scannable)</button>
+            <p class="btn-note" id="exportTierNote"></p>
+          </div>
+
+          <div class="handoff"><svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg> <b>Étape suivante, à faire toi-même</b> une fois le vrai fichier généré : ouvre Quadreti Designer, et importe-le comme n'importe quelle photo. Les deux outils ne communiquent jamais directement.
+            <button class="redirect-btn" onclick="window.open('https://designer.quadreti.fr','_blank')">Ouvrir Quadreti Designer <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel-right">
+      <div id="previewStandard" class="preview-block on">
+        <div class="qr-stage">
+          <canvas id="draftCanvas" width="300" height="300" role="img" aria-label="Aperçu approximatif du QR en cours de configuration"></canvas>
+        </div>
+        <p class="draft-caption">Brouillon local approximatif — <b>pas un vrai QR</b>, jamais livré tel quel.</p>
+        <div class="gauge-card">
+          <div class="gauge-top"><span class="gauge-label">Lisibilité au scan</span><span class="gauge-value" id="gaugeText">—</span></div>
+          <div class="gauge-track"><div class="gauge-marker" id="gaugeMarker" style="left:0%"></div></div>
+          <div class="gauge-note" id="gaugeNote">Ajoute une photo pour évaluer sa compatibilité.</div>
+        </div>
+      </div>
+
+      <div id="previewArtistic" class="preview-block">
+        <div class="loading-stage" id="artStage">
+          <svg class="icon" style="width:28px;height:28px;color:var(--slate)" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+          <div class="lbl">Décris un style puis clique « Générer le style »</div>
+        </div>
+        <div class="loading-note"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg> Seul mode où l'aperçu <b>n'est pas instantané</b> — la restylisation se calcule côté serveur, contrairement à Personnalisé/Image qui s'ajustent en direct à l'écran.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="navrow">
+    <button class="btn ghost" id="backBtn" onclick="go(-1)">&larr; Retour</button>
+    <button class="btn primary" id="nextBtn" onclick="go(1)">Continuer &rarr;</button>
+  </div>
+  <div class="legal-footer" style="padding-bottom:18px">
+    <a href="#">CGU</a>
+    <a href="#">Confidentialité</a>
+    <a href="https://quadreti.fr" target="_blank" rel="noopener">Retour à quadreti.fr <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg></a>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ---------- État global ---------- */
+var state = {
+  tier: 'Découverte',
+  photo: null,        // {img, name, sizeLabel}
+  galleryCount: 0,
+  destType: 'youtube',
+  destValue: '',
+  family: 'standard',  // 'standard' couvre Personnalisé ET Image (même panneau d'options, cf. board de référence)
+  familyVariant: 'standard', // 'standard' | 'image' — distingue seulement le rendu du brouillon
+  moduleColorSource: 'photo', // 'photo' | 'poster'
+  moduleShape: 'points',      // 'points' | 'squircle' | 'aplats' | 'traits'
+  markerBorder: 'square',
+  markerCenter: 'square',
+  colorMode: 'solid',         // 'solid' | 'linear' | 'radial'
+  colorA: '#2b353e',
+  colorB: '#e2725b',
+  logoIcon: 'heart'
+};
+
+/* ---------- Gate : connexion réelle Supabase (même compte que Quadreti Designer, code 6 chiffres par e-mail) ---------- */
+var QR_SB_URL = 'https://kmouckinihufnqxvvhxm.supabase.co';
+var QR_SB_KEY = 'sb_publishable_ZP-6tG2Iq0LA0ct0tlL6ng_FX39Wwmy';
+var QR_SESSION_KEY = 'qrDesignerSession';
+
+function sbHeaders(extra){
+  var h = { 'apikey': QR_SB_KEY, 'Content-Type': 'application/json' };
+  if (extra) for (var k in extra) h[k] = extra[k];
+  return h;
+}
+function getSession(){
+  try { return JSON.parse(localStorage.getItem(QR_SESSION_KEY) || 'null'); } catch(e){ return null; }
+}
+function setSession(s){
+  if (s) localStorage.setItem(QR_SESSION_KEY, JSON.stringify(s));
+  else localStorage.removeItem(QR_SESSION_KEY);
+}
+function showGateError(msg){
+  var el = document.getElementById('gateError');
+  el.textContent = msg || '';
+  el.classList.toggle('on', !!msg);
+}
+
+document.getElementById('loginEmail').addEventListener('input', function(){
+  document.getElementById('sendCodeBtn').disabled = !/^\S+@\S+\.\S+$/.test(this.value.trim());
+});
+document.getElementById('loginCode').addEventListener('input', function(){
+  this.value = this.value.replace(/\D/g,'').slice(0,6);
+  document.getElementById('validateCodeBtn').disabled = this.value.length !== 6;
+});
+
+function sendCode(){
+  var email = document.getElementById('loginEmail').value.trim();
+  var btn = document.getElementById('sendCodeBtn');
+  btn.disabled = true; btn.textContent = 'Envoi en cours…';
+  showGateError('');
+  fetch(QR_SB_URL + '/auth/v1/otp', {
+    method: 'POST',
+    headers: sbHeaders(),
+    body: JSON.stringify({ email: email, create_user: true })
+  }).then(function(r){
+    if (!r.ok) return r.json().then(function(j){ throw new Error(j.msg || j.error_description || 'envoi refusé'); });
+    document.getElementById('otpEmailEcho').textContent = email;
+    document.getElementById('otpStepEmail').classList.remove('on');
+    document.getElementById('otpStepCode').classList.add('on');
+    document.getElementById('loginCode').focus();
+  }).catch(function(e){
+    showGateError('Impossible d\'envoyer le code : ' + e.message + '. Vérifie l\'adresse et réessaie.');
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = 'Envoyer un code';
+  });
+}
+function backToEmail(){
+  document.getElementById('otpStepCode').classList.remove('on');
+  document.getElementById('otpStepEmail').classList.add('on');
+  document.getElementById('loginCode').value = '';
+  showGateError('');
+}
+function validateCode(){
+  var email = document.getElementById('loginEmail').value.trim();
+  var code = document.getElementById('loginCode').value.trim();
+  var btn = document.getElementById('validateCodeBtn');
+  btn.disabled = true; btn.textContent = 'Vérification…';
+  showGateError('');
+  fetch(QR_SB_URL + '/auth/v1/verify', {
+    method: 'POST',
+    headers: sbHeaders(),
+    body: JSON.stringify({ type: 'email', email: email, token: code })
+  }).then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+  .then(function(res){
+    if (!res.ok || !res.j.access_token) throw new Error(res.j.msg || res.j.error_description || 'code refusé');
+    setSession({ access_token: res.j.access_token, refresh_token: res.j.refresh_token, email: email.toLowerCase() });
+    return fetchPalier();
+  }).then(function(){
+    showTierStage();
+  }).catch(function(e){
+    showGateError('Code non accepté : ' + e.message + '. Vérifie le code reçu (le plus récent) et réessaie.');
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = 'Valider le code';
+  });
+}
+function fetchPalier(){
+  var s = getSession();
+  if (!s) { state.tier = 'Découverte'; state.isAdmin = false; return Promise.resolve(); }
+  var h = sbHeaders({ 'Authorization': 'Bearer ' + s.access_token });
+  var pAcces = fetch(QR_SB_URL + '/rest/v1/qr_acces?select=premium,generations_utilisees&email=eq.' + encodeURIComponent(s.email), { headers: h })
+    .then(function(r){ if (!r.ok) throw new Error('palier'); return r.json(); });
+  var pQuota = fetch(QR_SB_URL + '/rest/v1/qr_reglages?select=valeur&cle=eq.quota_par_client', { headers: h })
+    .then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; });
+  var pAdmin = fetch(QR_SB_URL + '/rest/v1/admins?select=email&email=ilike.' + encodeURIComponent(s.email), { headers: h })
+    .then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; });
+  return Promise.all([pAcces, pQuota, pAdmin]).then(function(res){
+    state.tier = (res[0][0] && res[0][0].premium) ? 'Premium' : 'Découverte';
+    state.utilisees = (res[0][0] && res[0][0].generations_utilisees) || 0;
+    var q = Number(res[1][0] && res[1][0].valeur);
+    state.quota = (isFinite(q) && q >= 0) ? q : 1;
+    state.isAdmin = res[2].length > 0;
+  }).catch(function(){
+    state.tier = 'Découverte'; state.isAdmin = false; state.utilisees = 0; state.quota = 1; // en cas de doute, le plus restrictif
+  });
+}
+function showTierStage(){
+  var premium = state.tier === 'Premium';
+  document.getElementById('tierCardDecouverte').classList.toggle('on', !premium);
+  document.getElementById('tierCardPremium').classList.toggle('on', premium);
+  document.getElementById('tierPremiumEtat').textContent = premium ? 'actif' : 'non activé';
+  var s = getSession();
+  document.getElementById('gateAccessSub').textContent =
+    'Connecté(e) en tant que ' + (s ? s.email : '') + ' — voici ton palier actuel pour cet outil précis.';
+  gateGo('gateAccess');
+}
+function gateGo(stageId){
+  document.querySelectorAll('.gate-stage').forEach(function(s){ s.classList.remove('on'); });
+  document.getElementById(stageId).classList.add('on');
+}
+function unlockApp(){
+  document.getElementById('tierPill').textContent = state.isAdmin ? state.tier + ' (admin)' : state.tier;
+  document.getElementById('adminGearBtn').style.display = state.isAdmin ? 'flex' : 'none';
+  document.getElementById('gateFrame').style.display = 'none';
+  document.getElementById('appFrame').classList.add('on');
+  updateExportForTier();
+}
+function relock(){
+  setSession(null);
+  state.tier = 'Découverte'; state.isAdmin = false;
+  document.getElementById('adminPanel').classList.remove('on');
+  document.getElementById('appFrame').classList.remove('on');
+  document.getElementById('gateFrame').style.display = 'block';
+  document.getElementById('loginCode').value = '';
+  gateGo('gateLogin');
+}
+function quotaRestantes(){
+  return Math.max(0, (state.quota || 0) - (state.utilisees || 0));
+}
+function updateExportForTier(){
+  var note = document.getElementById('exportTierNote');
+  var btn = document.getElementById('realExportBtn');
+  var premium = state.tier === 'Premium';
+  var cguOk = document.getElementById('cguCheck').checked;
+  var reste = quotaRestantes();
+  var quotaOk = state.isAdmin || reste > 0;
+  btn.disabled = !(premium && cguOk && quotaOk);
+  if (!premium){
+    btn.title = 'Fonction réservée au palier Premium';
+    note.textContent = 'Palier Découverte : la génération réelle est réservée à Premium (activation par l\'équipe Quadreti).';
+  } else if (state.isAdmin){
+    btn.title = cguOk ? '' : 'Coche la case de consentement ci-dessus';
+    note.textContent = cguOk
+      ? 'Compte admin — générations illimitées (dans la limite des 40/jour du compte qrcode-ai.com).'
+      : 'Compte admin — il reste à accepter les CGU et la transmission de la photo ci-dessus.';
+  } else if (!quotaOk){
+    btn.title = 'Quota de générations atteint';
+    note.textContent = 'Ton accès Premium incluait ' + state.quota + ' génération(s) réelle(s), déjà utilisée(s). Contacte Quadreti pour en obtenir davantage.';
+  } else {
+    btn.title = cguOk ? '' : 'Coche la case de consentement ci-dessus pour activer la génération';
+    note.textContent = cguOk
+      ? 'Palier Premium actif — il te reste ' + reste + ' génération(s) réelle(s).'
+      : 'Palier Premium actif (' + reste + ' génération(s) restante(s)) — il reste à accepter les CGU et la transmission de la photo ci-dessus.';
+  }
+}
+
+/* ---------- Panneau admin (visible seulement si l'e-mail connecté est dans la table admins) ---------- */
+function toggleAdminPanel(){
+  var p = document.getElementById('adminPanel');
+  var on = !p.classList.contains('on');
+  p.classList.toggle('on', on);
+  if (on){ loadAdminQuota(); loadAdminClients(); }
+}
+function adminRpc(nom, args){
+  var s = getSession();
+  if (!s) return Promise.reject(new Error('session expirée — reconnecte-toi'));
+  return fetch(QR_SB_URL + '/rest/v1/rpc/' + nom, {
+    method: 'POST',
+    headers: sbHeaders({ 'Authorization': 'Bearer ' + s.access_token }),
+    body: JSON.stringify(args || {})
+  }).then(function(r){
+    if (!r.ok) return r.json().then(function(j){ throw new Error(j.message || ('refusé (' + r.status + ')')); });
+    return r.status === 204 ? null : r.json();
+  });
+}
+function loadAdminQuota(){
+  var s = getSession();
+  if (!s) return;
+  fetch(QR_SB_URL + '/rest/v1/qr_reglages?select=valeur&cle=eq.quota_par_client', {
+    headers: sbHeaders({ 'Authorization': 'Bearer ' + s.access_token })
+  }).then(function(r){ return r.json(); }).then(function(rows){
+    if (rows[0]) document.getElementById('quotaInput').value = Number(rows[0].valeur);
+  }).catch(function(){});
+}
+function saveQuota(){
+  var n = parseInt(document.getElementById('quotaInput').value, 10);
+  var noteEl = document.getElementById('quotaSaveNote');
+  if (!isFinite(n) || n < 0){ noteEl.textContent = 'Valeur invalide.'; return; }
+  noteEl.textContent = 'Enregistrement…';
+  adminRpc('definir_reglage_qr', { p_cle: 'quota_par_client', p_valeur: n }).then(function(){
+    state.quota = n;
+    noteEl.textContent = 'Enregistré — effet immédiat pour tous les clients.';
+    updateExportForTier();
+  }).catch(function(e){ noteEl.textContent = 'Échec : ' + e.message; });
+}
+function loadAdminClients(){
+  var liste = document.getElementById('adminClientList');
+  liste.innerHTML = '<div class="admin-note">Chargement…</div>';
+  adminRpc('lister_acces_qr').then(function(rows){
+    if (!rows || !rows.length){ liste.innerHTML = '<div class="admin-note">Aucun client pour l\'instant.</div>'; return; }
+    liste.innerHTML = '';
+    rows.forEach(function(c){
+      var div = document.createElement('div');
+      div.className = 'admin-client';
+      var etat = c.premium ? '<span class="etat prem">Premium</span>' : '<span class="etat dec">Découverte</span>';
+      div.innerHTML = '<span class="mail"></span>' + etat +
+        '<span class="compteur">' + (c.generations_utilisees || 0) + ' génération(s) utilisée(s)</span>' +
+        '<span class="actions"></span>';
+      div.querySelector('.mail').textContent = c.email;
+      var actions = div.querySelector('.actions');
+      var btnPrem = document.createElement('button');
+      btnPrem.textContent = c.premium ? 'Repasser en Découverte' : 'Activer Premium';
+      btnPrem.onclick = function(){ setClientPremium(c.email, !c.premium); };
+      actions.appendChild(btnPrem);
+      var btnReset = document.createElement('button');
+      btnReset.textContent = 'Remettre le compteur à 0';
+      btnReset.onclick = function(){ resetClientCounter(c.email); };
+      actions.appendChild(btnReset);
+      liste.appendChild(div);
+    });
+  }).catch(function(e){
+    liste.innerHTML = '<div class="admin-note">Échec du chargement : ' + e.message + '</div>';
+  });
+}
+function setClientPremium(email, premium){
+  document.getElementById('adminPanelNote').textContent = 'Mise à jour…';
+  adminRpc('definir_acces_qr_admin', { p_email: email, p_premium: premium }).then(function(){
+    document.getElementById('adminPanelNote').textContent = '';
+    loadAdminClients();
+  }).catch(function(e){ document.getElementById('adminPanelNote').textContent = 'Échec : ' + e.message; });
+}
+function resetClientCounter(email){
+  document.getElementById('adminPanelNote').textContent = 'Mise à jour…';
+  adminRpc('reinitialiser_generations_qr', { p_email: email }).then(function(){
+    document.getElementById('adminPanelNote').textContent = '';
+    loadAdminClients();
+  }).catch(function(e){ document.getElementById('adminPanelNote').textContent = 'Échec : ' + e.message; });
+}
+function addClientPremium(){
+  var email = (document.getElementById('newClientEmail').value || '').trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)){ document.getElementById('adminPanelNote').textContent = 'Adresse e-mail invalide.'; return; }
+  setClientPremium(email, true);
+  document.getElementById('newClientEmail').value = '';
+}
+document.getElementById('cguCheck').addEventListener('change', updateExportForTier);
+
+function showExportStatus(kind, html){
+  var el = document.getElementById('exportStatus');
+  if (!kind){ el.className = 'export-status'; el.innerHTML = ''; return; }
+  el.className = 'export-status on ' + kind;
+  el.innerHTML = html;
+}
+function jwtUid(token){
+  try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub || null; }
+  catch(e){ return null; }
+}
+function uploadToBucket(path, blob, contentType, token){
+  return fetch(QR_SB_URL + '/storage/v1/object/qr-photos/' + path, {
+    method: 'POST',
+    headers: { 'apikey': QR_SB_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': contentType, 'x-upsert': 'true' },
+    body: blob
+  }).then(function(r){
+    if (!r.ok) return r.text().then(function(t){ throw new Error('envoi du fichier refusé (' + r.status + ')'); });
+    return path;
+  });
+}
+function logoBlob(){
+  // Rend l'icône de logo choisie en petit PNG (fond blanc arrondi, comme la zone réservée du brouillon)
+  return new Promise(function(resolve){
+    var c = document.createElement('canvas'); c.width = 256; c.height = 256;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#FFFFFF';
+    roundRectFill(ctx, 0, 0, 256, 256, 52);
+    drawLogoGlyph(ctx, 128, 128, 88, state.logoIcon, '#2b353e');
+    c.toBlob(resolve, 'image/png');
+  });
+}
+function buildDestinationPayload(){
+  if (state.destType === 'youtube'){
+    var lien = (document.getElementById('destYoutube').value || '').trim();
+    if (!/^https?:\/\//.test(lien)) return { erreur: 'Renseigne d\'abord le lien de la vidéo (étape Destination).' };
+    return { destinationType: 'youtube', destination: lien };
+  }
+  if (state.destType === 'msg'){
+    var msg = (document.getElementById('destMsg').value || '').trim();
+    if (!msg) return { erreur: 'Renseigne d\'abord le message à afficher (étape Destination).' };
+    return { destinationType: 'msg', destination: msg };
+  }
+  if (state.destType === 'wifi'){
+    var ssid = (document.getElementById('destSsid').value || '').trim();
+    if (!ssid) return { erreur: 'Renseigne d\'abord le nom du réseau WiFi (étape Destination).' };
+    return { destinationType: 'wifi', wifiSsid: ssid, wifiPass: document.getElementById('destWifiPass').value || '' };
+  }
+  return { erreur: 'La destination « galerie de photos » n\'est pas encore disponible en génération réelle — choisis YouTube, WiFi ou Message.' };
+}
+function callRealGeneration(){
+  var s = getSession();
+  if (!s){ showExportStatus('err', 'Session expirée — clique sur « revoir le verrouillage » pour te reconnecter.'); return; }
+  if (state.family === 'artistic'){
+    showExportStatus('err', 'Le mode Artistique IA n\'est pas encore branché en génération réelle — utilise Personnalisé ou Image pour l\'instant.');
+    return;
+  }
+  var dest = buildDestinationPayload();
+  if (dest.erreur){ showExportStatus('err', dest.erreur); return; }
+
+  var uid = jwtUid(s.access_token);
+  if (!uid){ showExportStatus('err', 'Session illisible — reconnecte-toi via « revoir le verrouillage ».'); return; }
+
+  var btn = document.getElementById('realExportBtn');
+  btn.disabled = true;
+  hideRealResult();
+  var wantsPhoto = !!state.photo && !!state.photo.file && (state.moduleColorSource === 'photo' || state.familyVariant === 'image');
+  var etape = wantsPhoto ? 'Envoi sécurisé de ta photo…' : 'Préparation…';
+  showExportStatus('info', '<div class="spinner" aria-hidden="true"></div><div id="exportStatusText">' + etape + '</div>');
+
+  var horodatage = Date.now();
+  var envois = [];
+  var photoPath = '', logoPath = '';
+
+  if (wantsPhoto){
+    var ext = (state.photo.file.type === 'image/png') ? 'png' : (state.photo.file.type === 'image/webp' ? 'webp' : 'jpg');
+    photoPath = uid + '/photo-' + horodatage + '.' + ext;
+    envois.push(uploadToBucket(photoPath, state.photo.file, state.photo.file.type || 'image/jpeg', s.access_token));
+  }
+  envois.push(logoBlob().then(function(blob){
+    logoPath = uid + '/logo-' + horodatage + '.png';
+    return uploadToBucket(logoPath, blob, 'image/png', s.access_token);
+  }));
+
+  Promise.all(envois).then(function(){
+    var txt = document.getElementById('exportStatusText');
+    if (txt) txt.textContent = 'Génération en cours chez qrcode-ai.com — quelques secondes…';
+    var corps = {
+      destinationType: dest.destinationType,
+      destination: dest.destination || '',
+      wifiSsid: dest.wifiSsid || '',
+      wifiPass: dest.wifiPass || '',
+      photoPath: photoPath,
+      logoPath: logoPath,
+      style: {
+        family: state.family, variant: state.familyVariant,
+        moduleColorSource: state.moduleColorSource, moduleShape: state.moduleShape,
+        markerBorder: state.markerBorder, markerCenter: state.markerCenter,
+        colorMode: state.colorMode, colorA: state.colorA, colorB: state.colorB
+      }
+    };
+    return fetch(QR_SB_URL + '/functions/v1/qr-generer', {
+      method: 'POST',
+      headers: sbHeaders({ 'Authorization': 'Bearer ' + s.access_token }),
+      body: JSON.stringify(corps)
+    });
+  }).then(function(r){ return r.json().then(function(j){ return { status: r.status, j: j }; }); })
+  .then(function(res){
+    if (res.status === 401){
+      setSession(null);
+      showExportStatus('err', 'Session expirée — clique sur « revoir le verrouillage » pour te reconnecter.');
+    } else if (res.status === 200 && res.j && res.j.ok && (res.j.imageBase64 || res.j.imageUrl)){
+      if (typeof res.j.restantes === 'number') state.utilisees = Math.max(0, (state.quota || 0) - res.j.restantes);
+      state.journalId = res.j.journalId || null;
+      showExportStatus('info', '<div class="spinner" aria-hidden="true"></div><div>QR reçu — vérification de scan en cours…</div>');
+      showRealResult(res.j.imageBase64 || res.j.imageUrl);
+      verifyRealResult();
+    } else if (res.j && res.j.message){
+      showExportStatus('err', res.j.message);
+    } else {
+      showExportStatus('err', 'Réponse inattendue du serveur (code ' + res.status + ').');
+    }
+  }).catch(function(e){
+    showExportStatus('err', (e && e.message) ? ('Échec : ' + e.message + '. Ton brouillon n\'est pas perdu.') : 'Le serveur de génération ne répond pas. Vérifie ta connexion et réessaie — ton brouillon n\'est pas perdu.');
+  }).finally(function(){
+    updateExportForTier();
+  });
+}
+function showRealResult(url){
+  state.realImageUrl = url;
+  var bloc = document.getElementById('realResult');
+  document.getElementById('realResultImg').src = url;
+  bloc.style.display = 'block';
+}
+var jsQrPromise = null;
+function ensureJsQR(){
+  if (window.jsQR) return Promise.resolve();
+  if (jsQrPromise) return jsQrPromise;
+  jsQrPromise = new Promise(function(resolve, reject){
+    var sc = document.createElement('script');
+    sc.src = 'jsqr.js';
+    sc.onload = resolve;
+    sc.onerror = function(){ jsQrPromise = null; reject(new Error('décodeur indisponible')); };
+    document.head.appendChild(sc);
+  });
+  return jsQrPromise;
+}
+function verifyRealResult(){
+  // Filet de sécurité hérité de V1 : ne jamais présenter un QR comme prêt sans l'avoir
+  // réellement décodé. Testé à plusieurs échelles : les styles en points se binarisent mal
+  // en haute résolution alors qu'un téléphone (image floutée/réduite) les lit très bien.
+  ensureJsQR().then(function(){
+    var img = document.getElementById('realResultImg');
+    var run = function(){
+      // Balayage large : les QR denses (domaine personnalisé, style points) ne se décodent
+      // parfois qu'aux petites échelles (mesuré : 144/112px pour q-art.quadreti.fr + points)
+      var echelles = [1024, 768, 512, 384, 320, 256, 200, 160, 144, 128, 112, 96];
+      var decode = null;
+      for (var i=0;i<echelles.length && !decode;i++){
+        var size = echelles[i];
+        var c = document.createElement('canvas'); c.width = size; c.height = size;
+        var ctx = c.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, size, size);
+        try {
+          var d = ctx.getImageData(0, 0, size, size);
+          var r = window.jsQR(d.data, size, size, { inversionAttempts: 'attemptBoth' });
+          if (r && r.data) decode = r.data;
+        } catch(e){ break; } // canvas verrouillé (image cross-origin) : vérification impossible
+      }
+      if (decode){
+        showExportStatus('info', 'Vérifié : ce QR se décode correctement (contenu lu : ' + decode.replace(/</g,'&lt;').slice(0,80) + '). Fais quand même un scan téléphone avant impression.');
+        // Journal serveur : consigne le lien réellement encodé (permet de reconstruire les
+        // redirections nous-mêmes si le prestataire disparaît un jour)
+        if (state.journalId){
+          var sj = getSession();
+          if (sj) fetch(QR_SB_URL + '/rest/v1/rpc/completer_journal_qr', {
+            method: 'POST',
+            headers: sbHeaders({ 'Authorization': 'Bearer ' + sj.access_token }),
+            body: JSON.stringify({ p_id: state.journalId, p_contenu: decode })
+          }).catch(function(){});
+        }
+      } else {
+        showExportStatus('err', 'Attention : le vérificateur interne n\'a pas réussi à décoder ce QR. Teste-le impérativement au téléphone avant toute impression — et si ça ne scanne pas, change de style et régénère.');
+      }
+    };
+    if (img.complete && img.naturalWidth) run(); else img.onload = run;
+  }).catch(function(){
+    showExportStatus('info', 'QR généré. Le vérificateur interne n\'est pas disponible ici — scanne-le avec ton téléphone avant impression.');
+  });
+}
+function hideRealResult(){
+  state.realImageUrl = null;
+  document.getElementById('realResult').style.display = 'none';
+  document.getElementById('realResultImg').removeAttribute('src');
+}
+function downloadRealResult(){
+  if (!state.realImageUrl) return;
+  fetch(state.realImageUrl).then(function(r){
+    if (!r.ok) throw new Error('téléchargement direct refusé');
+    return r.blob();
+  }).then(function(blob){
+    var a = document.createElement('a');
+    a.download = 'quadreti-qr-final.png';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  }).catch(function(){
+    window.open(state.realImageUrl, '_blank'); // repli : ouvre l'image, enregistrement manuel
+  });
+}
+
+/* Restauration de session au chargement : évite de redemander un code à chaque visite */
+(function restoreSession(){
+  var s = getSession();
+  if (!s || !s.access_token) return;
+  fetch(QR_SB_URL + '/auth/v1/user', {
+    headers: sbHeaders({ 'Authorization': 'Bearer ' + s.access_token })
+  }).then(function(r){
+    if (!r.ok) throw new Error('session invalide');
+    return fetchPalier();
+  }).then(function(){
+    showTierStage();
+  }).catch(function(){
+    setSession(null); // token périmé : retour connexion silencieux
+  });
+})();
+
+/* ---------- Navigation entre les 5 étapes ---------- */
+var step = 1, total = 5;
+function render(){
+  for (var i=1;i<=total;i++){
+    document.getElementById('s'+i).classList.toggle('on', i===step);
+    var t = document.querySelector('.tstep[data-step="'+i+'"]');
+    t.classList.toggle('active', i===step);
+    t.classList.toggle('done', i<step);
+    t.querySelector('.tn').setAttribute('aria-selected', i===step ? 'true' : 'false');
+  }
+  document.getElementById('backBtn').disabled = step===1;
+  document.getElementById('nextBtn').textContent = step===total ? 'Terminé' : 'Continuer →';
+}
+function go(dir){ var n = step+dir; if (n<1||n>total) return; step=n; render(); }
+document.querySelectorAll('.tstep .tn').forEach(function(btn, idx){
+  btn.addEventListener('click', function(){ step = idx+1; render(); });
+});
+
+/* ---------- Étape 1 : photo réelle (FileReader, aucun réseau) ---------- */
+document.getElementById('filePicker').addEventListener('change', function(e){
+  var f = e.target.files && e.target.files[0];
+  if (f) loadPhotoFile(f);
+});
+function loadPhotoFile(f){
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      state.photo = { img: img, file: f, name: f.name, sizeLabel: (f.size/1024/1024).toFixed(1) + ' Mo' };
+      document.getElementById('dz').style.display = 'none';
+      var box = document.getElementById('uploadedBox');
+      box.classList.add('on');
+      document.getElementById('uploadedThumb').style.backgroundImage = 'url(' + ev.target.result + ')';
+      document.getElementById('uploadedName').textContent = f.name;
+      document.getElementById('uploadedMeta').textContent = state.photo.sizeLabel + ' — importée';
+      document.getElementById('artThumb').style.backgroundImage = 'url(' + ev.target.result + ')';
+      document.getElementById('artPhotoName').textContent = f.name;
+      updateEligibility();
+      drawDraft();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function resetPhoto(){
+  state.photo = null;
+  document.getElementById('dz').style.display = 'flex';
+  document.getElementById('uploadedBox').classList.remove('on');
+  document.getElementById('filePicker').value = '';
+  updateEligibility();
+  drawDraft();
+}
+
+document.getElementById('filePickerMulti').addEventListener('change', function(e){
+  state.galleryCount = e.target.files ? e.target.files.length : 0;
+  document.getElementById('galleryCount').textContent = state.galleryCount
+    ? state.galleryCount + ' photo(s) ajoutée(s)'
+    : '';
+});
+
+/* ---------- Étape 2 : destination ---------- */
+function setDest(el, key){
+  document.querySelectorAll('.type-chip').forEach(function(c){ c.classList.remove('on'); c.setAttribute('aria-checked','false'); });
+  el.classList.add('on'); el.setAttribute('aria-checked','true');
+  document.querySelectorAll('.dest-form').forEach(function(f){ f.classList.remove('on'); });
+  document.getElementById('dest-'+key).classList.add('on');
+  state.destType = key;
+  onDestInput();
+}
+function onDestInput(){
+  var el = document.querySelector('#dest-' + state.destType + ' input');
+  state.destValue = el ? el.value : '';
+  drawDraft();
+}
+
+/* ---------- Étape 3 : modèles ---------- */
+var TEMPLATES = [
+  { colorSource:'photo', shape:'points',   colorMode:'solid',  a:'#2b353e', b:'#e2725b' },
+  { colorSource:'poster',shape:'aplats',   colorMode:'solid',  a:'#e2725b', b:'#2b353e' },
+  { colorSource:'poster',shape:'squircle', colorMode:'linear', a:'#4f7396', b:'#CBBD93' },
+  { colorSource:'poster',shape:'aplats',   colorMode:'linear', a:'#2b353e', b:'#e2725b' },
+  { colorSource:'photo', shape:'points',   colorMode:'radial', a:'#4f7396', b:'#CBBD93' },
+  { colorSource:'poster',shape:'squircle', colorMode:'solid',  a:'#CBBD93', b:'#2b353e' },
+  { colorSource:'photo', shape:'traits',   colorMode:'linear', a:'#e2725b', b:'#4f7396' },
+  { colorSource:'poster',shape:'points',   colorMode:'radial', a:'#2b353e', b:'#e2725b' }
+];
+function swatchBg(t){
+  if (t.colorMode==='solid') return t.a;
+  if (t.colorMode==='linear') return 'linear-gradient(135deg,' + t.a + ',' + t.b + ')';
+  return 'radial-gradient(circle,' + t.a + ',' + t.b + ')';
+}
+(function buildTemplateGrid(){
+  var grid = document.getElementById('tmplGrid');
+  TEMPLATES.forEach(function(t, i){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tmpl-card' + (i===0 ? ' on' : '');
+    btn.setAttribute('role','radio');
+    btn.setAttribute('aria-checked', i===0 ? 'true' : 'false');
+    btn.innerHTML = '<div class="tmpl-swatch" style="background:' + swatchBg(t) + '"></div>';
+    btn.addEventListener('click', function(){ applyTemplate(i); });
+    grid.appendChild(btn);
+  });
+})();
+function applyTemplate(i){
+  var t = TEMPLATES[i];
+  document.querySelectorAll('#tmplGrid .tmpl-card').forEach(function(c,idx){
+    c.classList.toggle('on', idx===i);
+    c.setAttribute('aria-checked', idx===i ? 'true':'false');
+  });
+  state.moduleColorSource = t.colorSource;
+  state.moduleShape = t.shape;
+  state.colorMode = t.colorMode;
+  state.colorA = t.a;
+  state.colorB = t.b;
+  syncStyleControlsFromState();
+  drawDraft();
+}
+function surpriseMe(){ applyTemplate(Math.floor(Math.random()*TEMPLATES.length)); }
+
+/* ---------- Étape 4 : style ---------- */
+function setFamily(el, key, variant){
+  document.querySelectorAll('.family-card').forEach(function(c){ c.classList.remove('on'); c.setAttribute('aria-checked','false'); });
+  el.classList.add('on'); el.setAttribute('aria-checked','true');
+  state.family = key;
+  state.familyVariant = variant || key;
+  document.getElementById('family-standard').classList.toggle('on', key==='standard');
+  document.getElementById('family-artistic').classList.toggle('on', key==='artistic');
+  document.getElementById('previewStandard').classList.toggle('on', key==='standard');
+  document.getElementById('previewArtistic').classList.toggle('on', key==='artistic');
+  if (state.familyVariant === 'image'){
+    state.moduleColorSource = 'photo';
+    document.querySelectorAll('#family-standard .opt-row')[0].querySelectorAll('.opt-card').forEach(function(c,idx){
+      c.classList.toggle('on', idx===0); c.setAttribute('aria-checked', idx===0?'true':'false');
+    });
+  }
+  drawDraft();
+}
+function pickModuleColor(el, v){ pickInGroup(el); state.moduleColorSource = v; drawDraft(); }
+function pickShape(el, v){ pickInGroup(el); state.moduleShape = v; drawDraft(); }
+function pickMarkerBorder(el, v){ pickInGroup(el); state.markerBorder = v; drawDraft(); }
+function pickMarkerCenter(el, v){ pickInGroup(el); state.markerCenter = v; drawDraft(); }
+function pickColorMode(el, v){ pickInGroup(el); state.colorMode = v; drawDraft(); }
+function pickInGroup(el){
+  el.parentElement.querySelectorAll('button').forEach(function(s){ s.classList.remove('on'); s.setAttribute('aria-checked','false'); });
+  el.classList.add('on'); el.setAttribute('aria-checked','true');
+}
+
+var PALETTE = [
+  { a:'#2b353e', mode:'solid' },
+  { a:'#e2725b', mode:'solid' },
+  { a:'#CBBD93', mode:'solid' },
+  { a:'#4f7396', mode:'solid' },
+  { a:'#e2725b', b:'#4f7396', mode:'grad' },
+  { a:'#2b353e', b:'#CBBD93', mode:'grad' }
+];
+(function buildColorSwatches(){
+  var wrap = document.getElementById('colorSwatchGrid');
+  PALETTE.forEach(function(p, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'sw' + (i===0?' on':'');
+    b.setAttribute('role','radio'); b.setAttribute('aria-checked', i===0?'true':'false');
+    b.style.background = p.mode==='solid' ? p.a : 'linear-gradient(135deg,' + p.a + ',' + p.b + ')';
+    b.addEventListener('click', function(){
+      wrap.querySelectorAll('.sw').forEach(function(s){ s.classList.remove('on'); s.setAttribute('aria-checked','false'); });
+      b.classList.add('on'); b.setAttribute('aria-checked','true');
+      state.colorA = p.a; state.colorB = p.b || p.a;
+      drawDraft();
+    });
+    wrap.appendChild(b);
+  });
+})();
+
+var LOGO_ICONS = [
+  {key:'bird', sym:'i-bird', name:'Oiseau'},
+  {key:'flower', sym:'i-flower', name:'Fleur'},
+  {key:'gift', sym:'i-gift', name:'Cadeau'},
+  {key:'diamond', sym:'i-diamond', name:'Alliance'},
+  {key:'cake', sym:'i-cake', name:'Gâteau'},
+  {key:'house', sym:'i-house', name:'Maison'},
+  {key:'heart', sym:'i-heart', name:'Cœur'}
+];
+(function buildLogoGrid(){
+  var grid = document.getElementById('logoIconGrid');
+  LOGO_ICONS.forEach(function(o, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'icon-cell' + (o.key==='heart' ? ' on' : '');
+    b.setAttribute('role','radio'); b.setAttribute('aria-checked', o.key==='heart' ? 'true':'false');
+    b.setAttribute('aria-label', o.name);
+    b.title = o.name;
+    b.innerHTML = '<svg class="icon" style="width:17px;height:17px" aria-hidden="true"><use href="#' + o.sym + '"></use></svg>';
+    b.addEventListener('click', function(){
+      grid.querySelectorAll('.icon-cell').forEach(function(c){ c.classList.remove('on'); c.setAttribute('aria-checked','false'); });
+      b.classList.add('on'); b.setAttribute('aria-checked','true');
+      state.logoIcon = o.key;
+      drawDraft();
+    });
+    grid.appendChild(b);
+  });
+})();
+
+function syncStyleControlsFromState(){
+  var srcIdx = state.moduleColorSource==='photo' ? 0 : 1;
+  setGroupIndex('#family-standard .opt-row', 0, srcIdx);
+  var shapeIdx = ['points','squircle','aplats','traits'].indexOf(state.moduleShape);
+  setGroupIndex('#family-standard .opt-row', 1, shapeIdx);
+  var ctabIdx = ['solid','linear','radial'].indexOf(state.colorMode);
+  document.querySelectorAll('.ctab').forEach(function(c,i){ c.classList.toggle('on', i===ctabIdx); c.setAttribute('aria-checked', i===ctabIdx?'true':'false'); });
+}
+function setGroupIndex(sel, groupIdx, itemIdx){
+  var groups = document.querySelectorAll(sel);
+  if (!groups[groupIdx]) return;
+  var items = groups[groupIdx].querySelectorAll('.opt-card');
+  items.forEach(function(c,i){ c.classList.toggle('on', i===itemIdx); c.setAttribute('aria-checked', i===itemIdx?'true':'false'); });
+}
+
+function generateArt(){
+  var stage = document.getElementById('artStage');
+  stage.innerHTML = '<div class="spinner" aria-hidden="true"></div><div class="lbl">Génération en cours…</div>';
+  setTimeout(function(){
+    stage.innerHTML = '<svg class="icon" style="width:26px;height:26px;color:var(--green)" aria-hidden="true"><use href="#i-check-circle"></use></svg><div class="lbl">Style généré (factice) — prêt à valider une fois l\'API branchée</div>';
+  }, 1200);
+}
+
+function toggleAcc(head){
+  var acc = head.parentElement;
+  var wasOpen = acc.classList.contains('open');
+  document.querySelectorAll('.accordion').forEach(function(a){ a.classList.remove('open'); });
+  if (!wasOpen) acc.classList.add('open');
+}
+
+/* ---------- Jauge de lisibilité : écart-type de luminance réel, mesuré sur la photo ---------- */
+function updateEligibility(){
+  var text = document.getElementById('gaugeText');
+  var marker = document.getElementById('gaugeMarker');
+  var note = document.getElementById('gaugeNote');
+  if (!state.photo){
+    text.textContent = '—'; text.style.color = 'var(--muted)';
+    marker.style.left = '0%';
+    note.textContent = 'Ajoute une photo pour évaluer sa compatibilité.';
+    return;
+  }
+  var c = document.createElement('canvas'); c.width = 32; c.height = 32;
+  var ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(state.photo.img, 0, 0, 32, 32);
+  var data = ctx.getImageData(0,0,32,32).data;
+  var lum = [], sum = 0;
+  for (var i=0;i<data.length;i+=4){
+    var l = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+    lum.push(l); sum += l;
+  }
+  var mean = sum/lum.length;
+  var variance = lum.reduce(function(a,v){ return a + (v-mean)*(v-mean); }, 0) / lum.length;
+  var stdev = Math.sqrt(variance);
+  var score = Math.max(0, Math.min(100, Math.round(stdev * 1.15)));
+  var label, color;
+  if (score < 25){ label='Faible'; color='var(--red)'; }
+  else if (score < 50){ label='Moyenne'; color='var(--amber)'; }
+  else if (score < 75){ label='Bonne'; color='var(--green)'; }
+  else { label='Excellente'; color='var(--green)'; }
+  text.textContent = label; text.style.color = color;
+  marker.style.left = score + '%';
+  note.textContent = score >= 50
+    ? state.photo.name + ' est un bon candidat — contraste suffisant pour bien ressortir.'
+    : state.photo.name + ' a peu de contraste — le rendu final variera moins visuellement d\'un module à l\'autre.';
+}
+
+/* ---------- Brouillon local (canvas) — approximatif, jamais un vrai QR décodable ---------- */
+var GRID = 21, QUIET = 2, TOTAL_CELLS = GRID + QUIET*2;
+
+function seededPattern(seedText){
+  var seed = 0;
+  var s = seedText || 'quadreti';
+  for (var i=0;i<s.length;i++) seed = (seed*31 + s.charCodeAt(i)) >>> 0;
+  var cells = [];
+  for (var r=0;r<GRID;r++){
+    var row = [];
+    for (var col=0;col<GRID;col++){
+      seed = (seed*1103515245 + 12345) >>> 0;
+      row.push(((seed >>> 16) % 100) < 46);
+    }
+    cells.push(row);
+  }
+  return cells;
+}
+function inFinder(r,c){
+  return (r<7 && c<7) || (r<7 && c>=GRID-7) || (r>=GRID-7 && c<7);
+}
+function inLogoZone(r,c){
+  var mid = GRID/2, span = 3.4;
+  return Math.abs(r-mid) < span && Math.abs(c-mid) < span;
+}
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+}
+function mix(rgb1, rgb2, t){
+  return {
+    r: Math.round(rgb1.r + (rgb2.r-rgb1.r)*t),
+    g: Math.round(rgb1.g + (rgb2.g-rgb1.g)*t),
+    b: Math.round(rgb1.b + (rgb2.b-rgb1.b)*t)
+  };
+}
+function rgbCss(rgb){ return 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')'; }
+function clampLum(rgb, dark){
+  var l = 0.299*rgb.r + 0.587*rgb.g + 0.114*rgb.b;
+  var target = dark ? 90 : 200;
+  if (dark && l <= target) return rgb;
+  if (!dark && l >= target) return rgb;
+  var t = dark ? Math.min(1,(l-target)/160) : Math.min(1,(target-l)/160);
+  var toward = dark ? {r:20,g:20,b:20} : {r:245,g:242,b:232};
+  return mix(rgb, toward, Math.max(t,0.35));
+}
+
+var photoSampleCache = null;
+function photoSampleGrid(){
+  if (!state.photo) return null;
+  if (photoSampleCache && photoSampleCache.img === state.photo.img) return photoSampleCache.data;
+  var c = document.createElement('canvas'); c.width = GRID; c.height = GRID;
+  var ctx = c.getContext('2d', { willReadFrequently: true });
+  var img = state.photo.img;
+  var side = Math.min(img.width, img.height);
+  var sx = (img.width-side)/2, sy = (img.height-side)/2;
+  ctx.drawImage(img, sx, sy, side, side, 0, 0, GRID, GRID);
+  var data = ctx.getImageData(0,0,GRID,GRID).data;
+  photoSampleCache = { img: img, data: data };
+  return data;
+}
+function samplePhotoColor(r, c){
+  var data = photoSampleGrid();
+  if (!data) return null;
+  var idx = (r*GRID + c) * 4;
+  return { r:data[idx], g:data[idx+1], b:data[idx+2] };
+}
+
+function cellColor(r, c, dark){
+  if (state.moduleColorSource === 'photo' && state.photo){
+    var raw = samplePhotoColor(r,c);
+    return clampLum(raw, dark);
+  }
+  var base;
+  if (state.colorMode === 'solid'){
+    base = hexToRgb(state.colorA);
+  } else {
+    var t = (r+c) / (GRID*2);
+    base = mix(hexToRgb(state.colorA), hexToRgb(state.colorB), t);
+  }
+  return clampLum(base, dark);
+}
+
+function drawShapeAt(ctx, cx, cy, size, shape){
+  var r = size/2;
+  ctx.beginPath();
+  switch(shape){
+    case 'circle':
+      ctx.arc(cx, cy, r, 0, Math.PI*2); break;
+    case 'hexagon':
+      for (var i=0;i<6;i++){
+        var a = Math.PI/180 * (60*i - 30);
+        var px = cx + r*Math.cos(a), py = cy + r*Math.sin(a);
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.closePath(); break;
+    case 'dotted':
+      for (var d=0; d<12; d++){
+        var ang = (Math.PI*2/12)*d;
+        ctx.moveTo(cx + r*0.85*Math.cos(ang), cy + r*0.85*Math.sin(ang));
+        ctx.arc(cx + r*0.85*Math.cos(ang), cy + r*0.85*Math.sin(ang), size*0.09, 0, Math.PI*2);
+      }
+      break;
+    case 'heart':
+      drawHeart(ctx, cx, cy, r); break;
+    case 'eye':
+      ctx.ellipse(cx, cy, r, r*0.62, 0, 0, Math.PI*2); break;
+    case 'diamond':
+      ctx.moveTo(cx, cy-r); ctx.lineTo(cx+r, cy); ctx.lineTo(cx, cy+r); ctx.lineTo(cx-r, cy); ctx.closePath(); break;
+    case 'star':
+      drawStar(ctx, cx, cy, r); break;
+    default:
+      ctx.rect(cx-r, cy-r, size, size);
+  }
+  ctx.fill();
+}
+function drawHeart(ctx, cx, cy, r){
+  ctx.moveTo(cx, cy + r*0.32);
+  ctx.bezierCurveTo(cx - r*1.1, cy - r*0.55, cx - r*0.45, cy - r*1.25, cx, cy - r*0.42);
+  ctx.bezierCurveTo(cx + r*0.45, cy - r*1.25, cx + r*1.1, cy - r*0.55, cx, cy + r*0.32);
+  ctx.closePath();
+}
+function drawStar(ctx, cx, cy, r){
+  var spikes = 5, step = Math.PI/spikes, rot = -Math.PI/2;
+  for (var i=0;i<spikes;i++){
+    var x1 = cx + Math.cos(rot)*r, y1 = cy + Math.sin(rot)*r;
+    i===0 ? ctx.moveTo(x1,y1) : ctx.lineTo(x1,y1); rot += step;
+    var x2 = cx + Math.cos(rot)*r*0.42, y2 = cy + Math.sin(rot)*r*0.42;
+    ctx.lineTo(x2,y2); rot += step;
+  }
+  ctx.closePath();
+}
+
+var draftPattern = seededPattern('quadreti');
+function drawDraft(){
+  var canvas = document.getElementById('draftCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cellPx = W / TOTAL_CELLS;
+  var bg = getComputedStyle(document.documentElement).getPropertyValue('--creme').trim() || '#F2EEDF';
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  draftPattern = seededPattern(state.destValue || state.destType);
+
+  if (state.familyVariant === 'image' && state.photo){
+    var img = state.photo.img;
+    var side = Math.min(img.width, img.height);
+    var sx = (img.width-side)/2, sy = (img.height-side)/2;
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(img, sx, sy, side, side, QUIET*cellPx, QUIET*cellPx, GRID*cellPx, GRID*cellPx);
+    ctx.globalAlpha = 1;
+  }
+
+  for (var r=0;r<GRID;r++){
+    for (var c=0;c<GRID;c++){
+      if (inFinder(r,c)) continue;
+      var dark = draftPattern[r][c];
+      var isLogo = inLogoZone(r,c);
+      if (isLogo) continue;
+      if (state.familyVariant === 'image'){
+        if (!dark) continue;
+        ctx.fillStyle = 'rgba(43,53,62,0.55)';
+      } else {
+        ctx.fillStyle = rgbCss(cellColor(r,c,dark));
+      }
+      var cx = (QUIET+c+0.5)*cellPx, cy = (QUIET+r+0.5)*cellPx;
+      var size = dark ? cellPx*0.86 : cellPx*0.5;
+      switch(state.moduleShape){
+        case 'squircle':
+          ctx.beginPath();
+          roundRectPath(ctx, cx-size/2, cy-size/2, size, size, size*0.3);
+          ctx.fill(); break;
+        case 'aplats':
+          ctx.fillRect(cx-cellPx/2, cy-cellPx/2, cellPx*1.02, cellPx*1.02); break;
+        case 'traits':
+          ctx.fillRect(cx-cellPx/2, cy-size/6, cellPx*1.02, Math.max(size/3,1.5)); break;
+        default:
+          ctx.beginPath(); ctx.arc(cx, cy, size/2, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  var finderColor = state.moduleColorSource==='poster' || !state.photo
+    ? rgbCss(clampLum(hexToRgb(state.colorA), true))
+    : rgbCss(clampLum(samplePhotoColor(3,3) || hexToRgb(state.colorA), true));
+  [[3,3],[3,GRID-4],[GRID-4,3]].forEach(function(pos){
+    var cx = (QUIET+pos[1]+0.5)*cellPx, cy = (QUIET+pos[0]+0.5)*cellPx;
+    drawFinderReal(ctx, cx, cy, cellPx, finderColor, bg);
+  });
+
+  var mid = (QUIET+GRID/2)*cellPx;
+  var logoSize = 3.2*cellPx*2;
+  ctx.fillStyle = bg;
+  roundRectFill(ctx, mid-logoSize/2, mid-logoSize/2, logoSize, logoSize, logoSize*0.22);
+  ctx.strokeStyle = 'rgba(43,53,62,0.25)';
+  ctx.lineWidth = 1;
+  roundRectPath(ctx, mid-logoSize/2, mid-logoSize/2, logoSize, logoSize, logoSize*0.22);
+  ctx.stroke();
+  drawLogoGlyph(ctx, mid, mid, logoSize*0.34, state.logoIcon, finderColor);
+}
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function roundRectFill(ctx, x, y, w, h, r){ roundRectPath(ctx,x,y,w,h,r); ctx.fill(); }
+function drawFinderReal(ctx, cx, cy, cellPx, color, bg){
+  var outer = 7*cellPx, ring = 5*cellPx, inner = 3*cellPx;
+  ctx.fillStyle = color; drawShapeAt(ctx, cx, cy, outer, state.markerBorder);
+  ctx.fillStyle = bg; drawShapeAt(ctx, cx, cy, ring, state.markerBorder);
+  ctx.fillStyle = color; drawShapeAt(ctx, cx, cy, inner, state.markerCenter);
+}
+function drawLogoGlyph(ctx, cx, cy, r, key, color){
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(r*0.14, 1.5);
+  ctx.beginPath();
+  if (key==='heart'){ drawHeart(ctx, cx, cy, r); ctx.fill(); }
+  else if (key==='star'){ drawStar(ctx, cx, cy, r); ctx.fill(); }
+  else if (key==='diamond'){ ctx.moveTo(cx,cy-r);ctx.lineTo(cx+r,cy);ctx.lineTo(cx,cy+r);ctx.lineTo(cx-r,cy);ctx.closePath(); ctx.fill(); }
+  else if (key==='house'){
+    ctx.moveTo(cx-r,cy+r*0.15); ctx.lineTo(cx,cy-r*0.65); ctx.lineTo(cx+r,cy+r*0.15);
+    ctx.stroke();
+    ctx.strokeRect(cx-r*0.6,cy,r*1.2,r*0.85);
+  }
+  else if (key==='gift'){
+    ctx.strokeRect(cx-r*0.75,cy-r*0.15,r*1.5,r*1.1);
+    ctx.moveTo(cx,cy-r*0.15); ctx.lineTo(cx,cy+r*0.95); ctx.stroke();
+  }
+  else if (key==='cake'){
+    ctx.strokeRect(cx-r*0.85,cy-r*0.1,r*1.7,r*0.95);
+    ctx.moveTo(cx-r*0.3,cy-r*0.1); ctx.lineTo(cx-r*0.3,cy-r*0.55); ctx.stroke();
+  }
+  else if (key==='flower'){
+    for (var a=0;a<6;a++){
+      var ang = Math.PI*2/6*a;
+      ctx.moveTo(cx+r*0.3*Math.cos(ang), cy+r*0.3*Math.sin(ang));
+      ctx.arc(cx+r*0.55*Math.cos(ang), cy+r*0.55*Math.sin(ang), r*0.32, 0, Math.PI*2);
+    }
+    ctx.fill();
+  }
+  else if (key==='bird'){
+    ctx.moveTo(cx-r, cy); ctx.quadraticCurveTo(cx, cy-r*0.9, cx+r, cy-r*0.2);
+    ctx.quadraticCurveTo(cx+r*0.3, cy+r*0.1, cx-r*0.4, cy+r*0.5);
+    ctx.stroke();
+  }
+  else { ctx.arc(cx,cy,r*0.6,0,Math.PI*2); ctx.fill(); }
+}
+
+/* ---------- Export : téléchargement réel du brouillon (watermarké, pas un vrai QR) ---------- */
+function downloadDraft(){
+  var src = document.getElementById('draftCanvas');
+  var out = document.createElement('canvas');
+  out.width = src.width; out.height = src.height;
+  var ctx = out.getContext('2d');
+  ctx.drawImage(src, 0, 0);
+  ctx.fillStyle = 'rgba(43,53,62,0.72)';
+  ctx.fillRect(0, out.height-30, out.width, 30);
+  ctx.fillStyle = '#F2EEDF';
+  ctx.font = '600 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('APERÇU — non scannable', out.width/2, out.height-11);
+  var link = document.createElement('a');
+  link.download = 'quadreti-qr-apercu.png';
+  link.href = out.toDataURL('image/png');
+  link.click();
+}
+
+/* ---------- Init ---------- */
+drawDraft();
+render();
+</script>
+</body>
+</html>
