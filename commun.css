@@ -1,0 +1,244 @@
+/* QuadretI — bloc commun (bandeau + menu + pied de page + bouton retour-haut)
+   Source UNIQUE pour tout le site (28/08) : avant ce fichier, ce bloc etait
+   copie-colle a l'identique dans chacune des pages -- le modifier voulait
+   dire le repeter partout, et un oubli sur une page (ex. Editeur Creatif)
+   pouvait la laisser diverger sans que personne ne l'ait decide. Desormais
+   une seule feuille de style, chargee partout via <link rel="stylesheet"
+   href="/commun.css"> (chemin absolu depuis la racine du site, marche a
+   n'importe quelle profondeur de dossier). Voir commun-bandeau.js et
+   commun-pied.js pour le HTML correspondant. Journal : JOURNAL.md, entree du
+   28/08 "Bandeau commun". */
+:root{
+  --qz-charbon:#2B353E;
+  --qz-creme:#F2EEDF;
+  --qz-terracotta:#E2725B;
+  --qz-kraft:#CBBD93;
+  --qz-clair:#F5F5F5;
+  --qz-sombre:#1f272e;
+}
+.qz-header{
+  width:100%; background:var(--qz-clair); border-bottom:none;
+  /* 29/08 soir : logo decale du bord gauche (padding-left 32 -> 56px),
+     demande fondateur ; mobile reste plus serre plus bas. */
+  padding:14px 32px 14px 56px; display:grid; grid-template-columns:1fr auto; align-items:center; gap:16px;
+  position:relative; z-index:60; box-sizing:border-box;
+}
+@media (max-width:640px){ .qz-header{ padding-left:24px; } }
+/* 03/09 : fondu du bandeau du haut retire (demande fondateur) -- essai du
+   30/08 abandonne, retour a un bord net sans transition. */
+.qz-logorow{ display:flex; align-items:center; gap:8px; text-decoration:none; justify-self:start; }
+.qz-qlogo{ display:grid; grid-template-columns:repeat(4,7px); grid-template-rows:repeat(4,7px); gap:1.4px; flex-shrink:0; }
+.qz-qlogo i{ border-radius:1.4px; background:transparent; }
+.qz-qlogo i.t{ background:#1e2b35; }
+.qz-qlogo i.a{ background:var(--qz-terracotta); }
+/* 08/09 : le mot-symbole est une image statique (quadreti-naming.svg, meme dessin exact que le
+   board), plus du texte live en @font-face -- le line-height du navigateur laissait un vide sous
+   la barre du q (jamais tout a fait au rendez-vous de la baseline) ou, corrige, ecrasait tout a
+   la vraie petite taille du bandeau. Une image tranche le probleme net : plus de metrique de
+   police a batailler, le rendu est fige exactement comme sur le board. Contrepartie assumee
+   (demande fondateur) : le mot n'anime plus lettre par lettre, il apparait direct avec le reste. */
+.qz-wordmark-img{ height:20px; width:auto; display:block; color:var(--qz-charbon); }
+/* Logo du bandeau du HAUT +20% (28/08, demande fondateur) : chaque mesure
+   augmentee de 20%, pas un transform:scale -- garde la taille reelle en
+   layout (evite tout chevauchement avec le bouton burger si le bandeau est
+   etroit). Scope a .qz-header uniquement : le pied de page a sa PROPRE
+   taille de logo (8px, plus bas dans ce fichier), pas concerne par cette
+   demande, ne doit pas grossir avec. .qz-dot/.qz-doti utilisent des unites
+   em relatives a la police du mot-symbole : suivent automatiquement. */
+/* 29/08 soir : +10% supplementaires ("agrandis encore un petit peu"). */
+.qz-header .qz-logorow{ gap:10.5px; }
+.qz-header .qz-qlogo{ grid-template-columns:repeat(4,9.2px); grid-template-rows:repeat(4,9.2px); gap:1.84px; }
+.qz-header .qz-qlogo i{ border-radius:1.84px; }
+.qz-header .qz-wordmark-img{ height:26px; }
+/* 07/09 : sequence refaite pour suivre exactement le "board" valide par le fondateur --
+   tesselles une par une (depart marque a la main : rangee 3/colonne droite, tour horaire,
+   queue orange en dernier), puis baseline en dactylo. Le mot (image, voir plus haut) n'anime
+   plus : il est visible des le depart avec le reste du bandeau. */
+.qz-qlogo i{ opacity:0; transform:scale(.4); animation:qzTuile .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes qzTuile{ to{ opacity:1; transform:scale(1); } }
+/* Ordre du tour (positions 1-16 de la grille 4x4, gauche->droite puis haut->bas) :
+   depart rangee3/col-droite (11) -> remonte a droite (7, 3) -> rangee du haut droite->gauche
+   (2, 1) -> descend a gauche (5, 9) -> rangee du bas gauche->droite (13, 14) -> queue orange (16). */
+.qz-qlogo i:nth-child(11){ animation-delay:.15s; }
+.qz-qlogo i:nth-child(7){ animation-delay:.30s; }
+.qz-qlogo i:nth-child(3){ animation-delay:.45s; }
+.qz-qlogo i:nth-child(2){ animation-delay:.60s; }
+.qz-qlogo i:nth-child(1){ animation-delay:.75s; }
+.qz-qlogo i:nth-child(5){ animation-delay:.90s; }
+.qz-qlogo i:nth-child(9){ animation-delay:1.05s; }
+.qz-qlogo i:nth-child(13){ animation-delay:1.20s; }
+.qz-qlogo i:nth-child(14){ animation-delay:1.35s; }
+.qz-qlogo i:nth-child(15){ animation-delay:1.50s; }
+.qz-qlogo i:nth-child(16){ animation-delay:1.65s; }
+.qz-wm-col{ display:flex; flex-direction:column; align-items:flex-start; gap:1px; }
+.qz-cat{
+  /* 29/08 soir : categorie agrandie au maximum raisonnable (8.5 -> 12px,
+     demande fondateur) -- au-dela elle depasse nettement le mot-symbole. */
+  font-family:'Jura',sans-serif; font-weight:600; font-size:12px; letter-spacing:.09em;
+  color:var(--qz-terracotta); white-space:nowrap;
+  display:inline-block; overflow:hidden; width:0;
+  animation:qzDactylo 2.2s steps(25,end) 2.25s forwards;
+}
+@keyframes qzDactylo{ to{ width:220px; } }
+@media (prefers-reduced-motion: reduce){
+  .qz-qlogo i{ animation:none; opacity:1; transform:none; }
+  .qz-cat{ animation:none; width:auto; }
+}
+.qz-burger{
+  justify-self:center; width:42px; height:42px; border-radius:22%;
+  background:#1e2b35; border:none; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  transition:background .15s;
+}
+.qz-burger:hover, .qz-burger:focus-visible{ background:#1f272e; }
+.qz-burger span{ width:18px; height:2px; border-radius:1px; background:var(--qz-creme); transition:transform .2s, opacity .2s; }
+.qz-burger.active span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+.qz-burger.active span:nth-child(2){ opacity:0; }
+.qz-burger.active span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
+.qz-navpanel{ width:100%; background:#1e2b35; max-height:0; overflow:hidden; transition:max-height .3s ease; position:relative; z-index:59; }
+.qz-navpanel.open{ max-height:640px; }
+.qz-navpanel > ul{ list-style:none; margin:0; padding:10px 32px 24px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.qz-navpanel > ul > li{ width:100%; max-width:280px; text-align:center; }
+.qz-navpanel a{ font-family:'Jura',sans-serif; font-weight:600; font-size:14px; color:#c9c3b2; text-decoration:none; padding:9px 0; display:block; }
+.qz-navpanel a:hover{ color:var(--qz-terracotta); }
+.qz-subtoggle{
+  width:100%; background:none; border:none; cursor:pointer;
+  font-family:'Jura',sans-serif; font-weight:600; font-size:14px; color:#c9c3b2;
+  padding:9px 0; display:flex; align-items:center; justify-content:center; gap:6px;
+  line-height:1.65;
+}
+.qz-subtoggle:hover{ color:var(--qz-terracotta); }
+.qz-subtoggle .qz-chev{ font-size:10px; transition:transform .2s; color:var(--qz-kraft); }
+li.qz-hassub.open .qz-subtoggle .qz-chev{ transform:rotate(180deg); }
+li.qz-hassub.open .qz-subtoggle{ color:var(--qz-creme); }
+.qz-sublist{ list-style:none; margin:0; padding:0; max-height:0; overflow:hidden; transition:max-height .25s ease; background:#37434e; border-radius:10px; display:flex; flex-direction:column; justify-content:center; }
+li.qz-hassub.open .qz-sublist{ max-height:400px; margin-bottom:4px; }
+.qz-sublist li{ max-width:none !important; }
+.qz-sublist a{ font-size:12.5px; font-weight:600; color:#9aa2a9; padding:8px 0; }
+.qz-sublist a:hover{ color:var(--qz-terracotta); }
+.qz-logo-perso{ display:none; max-height:42px; width:auto; object-fit:contain; }
+.qz-logorow.perso-actif .qz-qlogo, .qz-logorow.perso-actif .qz-wm-col{ display:none; }
+.qz-logorow.perso-actif .qz-logo-perso{ display:block; }
+.qz-nav-voile{
+  position:fixed; inset:0; background:rgba(0,0,0,.4);
+  opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:58;
+}
+.qz-nav-voile.open{ opacity:1; pointer-events:auto; }
+footer.qz-footer{
+  display:block; width:100%; max-width:none; box-sizing:border-box;
+  padding:0; margin:0; background:transparent; border:none; text-align:initial;
+}
+/* ===== 12/09 : pied de page v3 (mock-up « Pied de page navy » valide par le fondateur). Zone navy a 4 colonnes (logo du bandeau,
+   Quadreti, Aide, Informations + reseaux), decroche en haut et en bas (BORD 3 du fondateur, meme dessin que le bandeau defilant) avec
+   lisere, copyright centre dans une barre grise (les boutons flottants occupent les cotes). Le navy vient du panneau ("Fond bandeau &
+   pied de page", reglages-site.js) ; la barre grise, les titres et le lisere sont les jetons ci-dessous. Les regles prefixees
+   footer.qz-footer passent devant les couleurs injectees par le panneau (meme classe, specificite superieure). ===== */
+:root{--qz-encre:#10181f;--qz-pied-barre:#dedede;--qz-pied-barre-texte:#1e2b35;--qz-pied-titre:#dedede;--qz-lisere:var(--qz-terracotta,#d96c2f);--qz-lisere-ep:3px;--qz-pied-decroche:22px}
+.qz-pied3{
+  width:100%; background:#1e2b35; box-sizing:border-box;
+  padding:30px 36px 38px;
+  display:grid; grid-template-columns:1.35fr 1fr 1fr 1fr; gap:36px; align-items:start;
+  max-width:none; position:relative;
+}
+.qz-pied-bord{ position:relative; height:var(--qz-pied-decroche); overflow:visible; pointer-events:none; }
+.qz-pied-bord .qz-pied-svg{ position:absolute; left:0; width:100%; height:100%; display:block; overflow:visible; }
+.qz-pied-bord-haut .qz-pied-svg{ bottom:0; }
+.qz-pied-bord-bas{ background:var(--qz-pied-barre); }
+.qz-pied-bord-bas .qz-pied-svg{ top:0; transform:scale(-1,-1); }
+.qz-pied-fond{ fill:var(--qz-pied-fond,#1e2b35); }
+.qz-pied-trait{ fill:none; stroke:var(--qz-lisere); stroke-width:var(--qz-lisere-ep); stroke-linejoin:round; stroke-linecap:round; }
+/* logo : le bloc du bandeau (plaque 66 px, naming 27 px, accroche et categorie en Jura sur trois lignes) */
+.qz-pied3 .qz-col{ min-width:0; }
+.qz-basdepage{ display:flex; flex-direction:column; align-items:flex-start; }
+.qz-basdepage .qz-logorow{ display:flex; align-items:center; gap:14px; text-decoration:none; }
+footer.qz-footer .qz-basdepage .qz-plaque{ --t:66px; --qz-prof:1px; }
+.qz-basdepage .qz-wm-col{ display:flex; flex-direction:column; justify-content:flex-start; gap:0; height:66px; margin-top:3px; --qz-point-x:.14em; --qz-point-y:.969em; --qz-point-t:.07em; }
+.qz-basdepage .qz-naming.qz-wordmark-img{ height:auto; font-family:"Quadreti Naming",sans-serif; font-size:27px; line-height:1; white-space:nowrap; display:inline-block; position:relative; padding:0; }
+.qz-basdepage .qz-pied-accroche{ font-family:'Jura',sans-serif; font-weight:700; font-size:14.5px; line-height:19.5px; letter-spacing:.02em; white-space:nowrap; }
+footer.qz-footer .qz-basdepage .qz-wordmark-img, footer.qz-footer .qz-basdepage .qz-pied-accroche{ color:var(--qz-pied-titre); } /* naming, tesselles du Q et accroche en gris, devant la couleur injectee par le panneau */
+.qz-basdepage .qz-cat{ display:inline-block; width:auto; opacity:1; animation:none; overflow:visible; font-family:'Jura',sans-serif!important; font-weight:700; font-size:14.5px; line-height:19.5px; letter-spacing:.02em!important; text-transform:none; color:var(--qz-terracotta,#d96c2f); margin:0; white-space:nowrap; }
+/* titres de colonnes : capitales Jura, sans tesselle */
+.qz-coltitre{
+  font-family:'Jura',sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:.08em; text-transform:uppercase; margin:2px 0 18px;
+}
+footer.qz-footer .qz-coltitre{ color:var(--qz-pied-titre); }
+.qz-coltitre::before{ display:none; }
+.qz-pied-infos ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.qz-pied-infos a{
+  color:var(--qz-creme); opacity:.88; text-decoration:none; font-size:14.5px; font-family:'Jura',sans-serif; font-weight:500;
+  position:relative; display:inline-block;
+}
+/* soulignement anime CSS pur : un trait accent qui glisse au survol */
+.qz-pied-infos a::after{
+  content:''; position:absolute; left:0; bottom:-2px; width:0; height:1.5px;
+  background:var(--qz-terracotta); transition:width .22s ease;
+}
+.qz-pied-infos a:hover, .qz-pied-infos a:focus-visible{ color:var(--qz-terracotta); opacity:1; }
+.qz-pied-infos a:hover::after, .qz-pied-infos a:focus-visible::after{ width:100%; }
+@media (prefers-reduced-motion: reduce){ .qz-pied-infos a::after{ transition:none; } }
+/* reseaux : sous les informations, carres 4 px comme les boutons du site */
+.qz-reseaux{ margin-top:22px; }
+.qz-reseaux .qz-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+/* 13/09, demande du fondateur : orange de marque et surbrillance du CTA de l accueil.
+   Ils etaient en --qz-kraft, reste de la charte abandonnee, et viraient a l orange seulement au survol -- la couleur d appel servait
+   d effet de survol au lieu d etre la couleur du bouton.
+   Le pictogramme prend le GRIS #dedede, pas le blanc ni l encre : c est la regle posee par le fondateur le 13/09 pour tout texte ou
+   fleche sur un bouton orange, et les autres boutons orange des apps la suivent deja. Contraste mesure 2,54 -- sous le seuil de 4,5,
+   arbitrage assume par lui ; l encre #10181f donnerait 5,23 si la question revient.
+   Relief et eclat repris du CTA (bandeau-relief.css), reproduits ici : le pied commun ne charge pas ce fichier. */
+.qz-reseaux .qz-grid a{
+  width:38px; height:38px; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  text-decoration:none; transition:transform .15s, box-shadow .15s, background .15s;
+  background:var(--qz-terracotta); color:var(--qz-pied-titre,#dedede);
+  position:relative; overflow:hidden;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.38), inset -1px -1px 0 rgba(0,0,0,.28), 0 5px 12px rgba(0,0,0,.4);
+}
+.qz-reseaux .qz-grid a::after{
+  content:""; position:absolute; top:-30%; bottom:-30%; left:-45%; width:38%; pointer-events:none;
+  background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 100%);
+  transform:translateX(-120%) skewX(-18deg); opacity:0;
+}
+.qz-reseaux .qz-grid a:hover, .qz-reseaux .qz-grid a:focus-visible{
+  transform:translateY(-3px);
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.5), inset -1px -1px 0 rgba(0,0,0,.28), 0 7px 16px rgba(0,0,0,.45);
+}
+.qz-reseaux .qz-grid a:hover::after, .qz-reseaux .qz-grid a:focus-visible::after{
+  animation:qz-reflet .75s cubic-bezier(.4,0,.2,1) forwards;
+}
+.qz-reseaux .qz-grid a:active{ transform:none; box-shadow:inset 2px 2px 4px rgba(0,0,0,.35); }
+@keyframes qz-reflet{ 0%{ transform:translateX(-120%) skewX(-18deg); opacity:0 } 15%{ opacity:1 } 100%{ transform:translateX(420%) skewX(-18deg); opacity:0 } }
+@media (prefers-reduced-motion:reduce){ .qz-reseaux .qz-grid a:hover::after, .qz-reseaux .qz-grid a:focus-visible::after{ animation:none } }
+.qz-reseaux .qz-ico{ width:18px; height:18px; display:block; fill:currentColor; }
+/* barre grise du copyright, centre : la bulle contact et le bouton Remonter occupent gauche et droite */
+.qz-pied-barre{
+  width:100%; box-sizing:border-box; border:none;
+  padding:14px 96px 16px; text-align:center;
+}
+footer.qz-footer .qz-pied-barre{ background:var(--qz-pied-barre); }
+footer.qz-footer .qz-pied-barre .qz-copy{ color:var(--qz-pied-barre-texte); font-family:'Jura',sans-serif; font-size:12px; font-weight:600; }
+@media (max-width:900px){
+  .qz-pied3{ grid-template-columns:1fr 1fr; gap:28px; padding:34px 24px 30px; }
+  .qz-basdepage{ grid-column:1 / -1; }
+  .qz-pied-bord{ display:none; }
+}
+@media (max-width:560px){
+  .qz-pied3{ grid-template-columns:1fr; }
+  .qz-pied-barre{ padding:12px 70px 60px; }
+}
+.qz-fab{
+  position:fixed; right:18px; bottom:18px; z-index:70;
+  width:38px; height:38px; border-radius:50%;
+  background:#37434e; border:1px solid #ffffff1f;
+  display:flex; align-items:center; justify-content:center;
+  text-decoration:none; transition:background .15s, border-color .15s;
+}
+.qz-fab:hover, .qz-fab:focus-visible{ background:var(--qz-terracotta); border-color:var(--qz-terracotta); }
+.qz-fab svg{ width:14px; height:14px; stroke:var(--qz-kraft); fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+.qz-fab:hover svg{ stroke:var(--qz-creme); }
+/* 11/09, demande fondateur : les boutons d'action du site passent en rectangle a leger arrondi (plus de pilule),
+   sur toutes les pages. Les badges, etiquettes, onglets et interrupteurs gardent leur forme. !important : la boutique
+   (Ecwid) force elle-meme ses boutons en pilule avec !important. */
+.cta, .c-submit, .btn-imprimer, .cta-boutique-btn, .tour-btn, .finale button, .pop-nav button, .nav-cta, .mm-cta, .btn,
+#my-store-139886004 .form-control__button, #my-store-139886004 .ec-cart__button button, #my-store-139886004 button.form-control__button{ border-radius:4px !important; }

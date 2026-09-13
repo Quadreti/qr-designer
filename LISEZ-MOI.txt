@@ -1,0 +1,44 @@
+QR QUADRETI — dossier de depot (mis a jour le 13/09/2026, demande directe du fondateur)
+=========================================================================================
+
+CE QUE C'EST
+------------
+QR Quadreti (V3) : generateur QR maison, 100% local, zero dependance externe
+(remplace l'ancien Quadreti Q-Art / qrcode-ai.com, abandonne le 26/08/2026 --
+voir SITE\APPLICATION\QR-CODE-DESIGNER\GLOSSAIRE-ETAT-DES-LIEUX.md). Le type
+de QR "Dynamique" appelle un backend Supabase reel (projet "Quadreti Project",
+Edge Functions lien-creer/lien-modifier/lien-rediriger).
+
+CONTENU DU DOSSIER
+-------------------
+- index.html          : la page complete (copie de SITE\APPLICATION\QR-CODE-DESIGNER\V3\v3.html)
+- qrcode-generateur.js : moteur QR local, OBLIGATOIRE a cote de index.html
+- jsqr.js              : verificateur de scan (jauge de lisibilite), OBLIGATOIRE
+- commun-pied.js       : pied de page COMMUN du site (reutilise directement,
+                         demande fondateur du 13/09 -- voir COMPTE-RENDU-V3.md,
+                         section "Le pied de l'app devient le pied commun")
+- commun.css           : styles du pied commun (jetons de couleur)
+- logo-v5.css          : police/animation du logo de marque, reutilisee par
+                         l'animation du logo Q+R de cette app
+- CNAME                : qr.quadreti.fr (sous-domaine dedie, DNS IONOS pose le 13/09)
+
+DECISION DNS DEJA PRISE ET APPLIQUEE (13/09)
+----------------------------------------------
+qr.quadreti.fr -> A/AAAA vers les IP GitHub Pages (185.199.108/109/110/111.153
+et 2606:50c0:8000-8003::153) -- pas de CNAME classique car le sous-domaine
+porte deja des enregistrements MX/TXT (messagerie IONOS) avec lesquels un
+CNAME ne peut pas coexister. Poses et verifies par le fondateur le 13/09.
+
+NOTES TECHNIQUES
+-----------------
+- Cles Supabase presentes dans index.html : cle PUBLIQUE (anon/publishable)
+  du projet "Quadreti Project", prevue pour etre publiee.
+- commun-pied.js est charge avec l'attribut data-base="https://quadreti.fr"
+  (les liens du pied sont relatifs sur le site, absolus partout ailleurs --
+  cet attribut est une adaptation retro-compatible du fichier commun, PAS une
+  copie divergente).
+- Source de verite = SITE\APPLICATION\QR-CODE-DESIGNER\V3\v3.html (fil QR Code
+  Designer). En cas de mise a jour, redemander une copie a ce fil plutot que
+  d'editer ce dossier a la main.
+
+Contact : fil "QR Code Designer" (voir CLAUDE.md racine / COMPTE-RENDU-V3.md).
