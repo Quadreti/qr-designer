@@ -396,6 +396,27 @@
   .qzs-cat{ font-family:'Jura',sans-serif; font-weight:700; font-size:14.5px; line-height:19.5px; letter-spacing:.02em; color:var(--site-orange); white-space:nowrap; }
   @media (max-width:640px){ .qzs-cat{ font-size:11px; } }
 
+  /* ---- 14/09 (Site & Boutique) : « Mon Espace », le meme bouton que sur les quatre autres apps ----
+     Couleurs prises aux jetons existants de l app : gris sur la barre navy (10,75), orange au survol
+     (4,22 sur le navy, au-dessus du 3:1 des objets graphiques). */
+  .qzs-espace{ display:inline-flex; align-items:center; gap:8px; flex-shrink:0; align-self:center;
+    padding:7px 12px; min-height:34px; box-sizing:border-box;
+    border:1px solid color-mix(in srgb,var(--site-gris) 45%,transparent); border-radius:999px;
+    color:var(--site-gris); text-decoration:none; white-space:nowrap;
+    font-family:'Jura',sans-serif; font-weight:700; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; }
+  .qzs-espace:hover, .qzs-espace:focus-visible{ border-color:var(--site-orange); color:var(--site-gris); }
+  /* Le mini pele-mele : quatre tesselles, une orange. L unite du produit, pas un pictogramme emprunte. */
+  .qzs-espace-plaque{ display:grid; grid-template-columns:repeat(2,5px); grid-template-rows:repeat(2,5px); gap:1.5px; flex-shrink:0; }
+  .qzs-espace-plaque i{ background:var(--site-gris); border-radius:1px; }
+  .qzs-espace-plaque i.o{ background:var(--site-orange); }
+  /* Sur bureau, le bouton se pose APRES le menu : dans cette barre le <nav> vient apres le burger, donc c est l ordre
+     flex qui le deplace, pas la position dans le HTML. */
+  @media (min-width:901px){ .qzs-espace{ order:1; } .qzs-nav{ margin-left:auto; } }
+  /* Tres petit ecran : le mot s efface, la plaque reste. Le nom accessible est porte par aria-label. */
+  @media (max-width:560px){
+    .qzs-espace-mot{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .qzs-espace{ padding:7px 9px; min-width:34px; justify-content:center; }
+  }
   .qzs-burger{ display:none; flex-direction:column; justify-content:center; gap:4px; width:34px; height:34px; border:none; background:var(--site-orange); border-radius:4px; padding:0; cursor:pointer; }
   .qzs-burger span{ display:block; width:16px; height:2px; margin:0 auto; background:var(--site-creme); border-radius:1px; }
   @media (max-width:900px){ .qzs-burger{ display:flex; } }
@@ -676,6 +697,12 @@
         <span class="qzs-app-nom">QR Quadreti</span>
         <span class="qzs-app-base">Éditez. Habillez. Scannez.</span>
       </span>
+    </a>
+    <!-- 14/09 (Site & Boutique) — le chemin inverse : l app renvoyait vers le Studio, rien ne ramenait le client a SES
+         fichiers. Lien absolu : on quitte le sous-domaine pour le site. -->
+    <a class="qzs-espace" href="https://quadreti.fr/mon-espace/" aria-label="Mon Espace Client">
+      <span class="qzs-espace-plaque" aria-hidden="true"><i></i><i></i><i></i><i class="o"></i></span>
+      <span class="qzs-espace-mot">Mon Espace</span>
     </a>
     <button type="button" class="qzs-burger" id="qzsBurger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="qzsNav"><span></span><span></span><span></span></button>
     <nav class="qzs-nav" id="qzsNav" aria-label="Menu principal du site">
@@ -1823,6 +1850,9 @@ $('btnTelecharger').addEventListener('click', function(){
 /* ---------- En-tete/pied communs du site (lecture live, repli statique deja dans le HTML) ---------- */
 (function(){
   function echapperHtml(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  /* 14/09 : un lien de menu est soit un chemin du site, soit une adresse entiere. */
+  function adresseSite(lien){ return /^[a-z]+:|^\/\//i.test(lien) ? lien : 'https://quadreti.fr' + lien; }
+
   function appliquerMenu(liens){
     if (!liens || !liens.length) return;
     var ul = document.getElementById('qzsNavList'); if (!ul) return;
@@ -1830,10 +1860,14 @@ $('btnTelecharger').addEventListener('click', function(){
       if (item.sousMenu && item.sousMenu.length){
         return '<li class="qzs-hassub"><button type="button" class="qzs-subtoggle" aria-expanded="false">' + echapperHtml(item.texte) +
           ' <span aria-hidden="true">▾</span></button><ul class="qzs-sublist">' +
-          item.sousMenu.map(function(s){ return '<li><a href="https://quadreti.fr' + echapperHtml(s.lien) + '">' + echapperHtml(s.texte) + '</a></li>'; }).join('') +
+          /* 14/09 (Site & Boutique) : une entree de menu peut porter une adresse COMPLETE depuis que le volet Studio nomme les
+             apps, dont deux vivent sur leur propre sous-domaine. Prefixer aveuglement donnait
+             « https://quadreti.frhttps://qr.quadreti.fr ». On ne prefixe donc que ce qui est un chemin du site. */
+          item.sousMenu.map(function(s){ return '<li><a href="' + echapperHtml(adresseSite(s.lien)) + '">' + echapperHtml(s.texte) + '</a></li>'; }).join('') +
           '</ul></li>';
       }
-      return '<li><a href="https://quadreti.fr' + echapperHtml(item.lien) + '">' + echapperHtml(item.texte) + '</a></li>';
+      /* Le premier niveau avait le meme defaut, latent : traite aussi. */
+      return '<li><a href="' + echapperHtml(adresseSite(item.lien)) + '">' + echapperHtml(item.texte) + '</a></li>';
     }).join('');
   }
   function appliquerCopyright(c){
