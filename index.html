@@ -403,10 +403,11 @@
      l orange de marque n y passerait pas (2,54). */
   @media (min-width:901px){
     #qzsNavList a[href*="/mon-espace/"]{
-      background:var(--site-gris); border-radius:999px; padding:6px 14px; margin-left:8px; color:var(--site-navy)!important;
+      background:var(--site-gris); border-radius:4px; padding:6px 14px; margin-left:8px; color:var(--site-navy)!important;   /* 15/09, fondateur : leger arrondi, jamais la pilule */
     }
+    /* Surbrillance : le fond s eclaircit vers le blanc, comme partout ailleurs. Texte navy dessus : 14,46. */
     #qzsNavList a[href*="/mon-espace/"]:hover,
-    #qzsNavList a[href*="/mon-espace/"]:focus-visible{ color:var(--site-orange-texte)!important; }
+    #qzsNavList a[href*="/mon-espace/"]:focus-visible{ background:#ffffff; color:var(--site-navy)!important; }
   }
   .qzs-burger{ display:none; flex-direction:column; justify-content:center; gap:4px; width:34px; height:34px; border:none; background:var(--site-orange); border-radius:4px; padding:0; cursor:pointer; }
   .qzs-burger span{ display:block; width:16px; height:2px; margin:0 auto; background:var(--site-creme); border-radius:1px; }
