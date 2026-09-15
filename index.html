@@ -396,26 +396,17 @@
   .qzs-cat{ font-family:'Jura',sans-serif; font-weight:700; font-size:14.5px; line-height:19.5px; letter-spacing:.02em; color:var(--site-orange); white-space:nowrap; }
   @media (max-width:640px){ .qzs-cat{ font-size:11px; } }
 
-  /* ---- 14/09 (Site & Boutique) : « Mon Espace », le meme bouton que sur les quatre autres apps ----
-     Couleurs prises aux jetons existants de l app : gris sur la barre navy (10,75), orange au survol
-     (4,22 sur le navy, au-dessus du 3:1 des objets graphiques). */
-  .qzs-espace{ display:inline-flex; align-items:center; gap:8px; flex-shrink:0; align-self:center;
-    padding:7px 12px; min-height:34px; box-sizing:border-box;
-    border:1px solid color-mix(in srgb,var(--site-gris) 45%,transparent); border-radius:999px;
-    color:var(--site-gris); text-decoration:none; white-space:nowrap;
-    font-family:'Jura',sans-serif; font-weight:700; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; }
-  .qzs-espace:hover, .qzs-espace:focus-visible{ border-color:var(--site-orange); color:var(--site-gris); }
-  /* Le mini pele-mele : quatre tesselles, une orange. L unite du produit, pas un pictogramme emprunte. */
-  .qzs-espace-plaque{ display:grid; grid-template-columns:repeat(2,5px); grid-template-rows:repeat(2,5px); gap:1.5px; flex-shrink:0; }
-  .qzs-espace-plaque i{ background:var(--site-gris); border-radius:1px; }
-  .qzs-espace-plaque i.o{ background:var(--site-orange); }
-  /* Sur bureau, le bouton se pose APRES le menu : dans cette barre le <nav> vient apres le burger, donc c est l ordre
-     flex qui le deplace, pas la position dans le HTML. */
-  @media (min-width:901px){ .qzs-espace{ order:1; } .qzs-nav{ margin-left:auto; } }
-  /* Tres petit ecran : le mot s efface, la plaque reste. Le nom accessible est porte par aria-label. */
-  @media (max-width:560px){
-    .qzs-espace-mot{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-    .qzs-espace{ padding:7px 9px; min-width:34px; justify-content:center; }
+  /* ---- 15/09 (Site & Boutique) : « Mon Espace » dans la barre ----
+     Le bouton pose en dur le 14 a ete retire (doublon avec la rubrique du menu). La rubrique prend son role et son aspect.
+     LA REGLE, dite par le fondateur : « bouton bleu sur arriere-plan gris, bouton gris sur arriere-plan bleu ». Cette barre
+     est navy : pastille grise, texte navy — 10,75 dans les deux sens. Survol a l orange-texte (4,77 sur le gris) ;
+     l orange de marque n y passerait pas (2,54). */
+  @media (min-width:901px){
+    #qzsNavList a[href*="/mon-espace/"]{
+      background:var(--site-gris); border-radius:999px; padding:6px 14px; margin-left:8px; color:var(--site-navy)!important;
+    }
+    #qzsNavList a[href*="/mon-espace/"]:hover,
+    #qzsNavList a[href*="/mon-espace/"]:focus-visible{ color:var(--site-orange-texte)!important; }
   }
   .qzs-burger{ display:none; flex-direction:column; justify-content:center; gap:4px; width:34px; height:34px; border:none; background:var(--site-orange); border-radius:4px; padding:0; cursor:pointer; }
   .qzs-burger span{ display:block; width:16px; height:2px; margin:0 auto; background:var(--site-creme); border-radius:1px; }
@@ -698,12 +689,9 @@
         <span class="qzs-app-base">Éditez. Habillez. Scannez.</span>
       </span>
     </a>
-    <!-- 14/09 (Site & Boutique) — le chemin inverse : l app renvoyait vers le Studio, rien ne ramenait le client a SES
-         fichiers. Lien absolu : on quitte le sous-domaine pour le site. -->
-    <a class="qzs-espace" href="https://quadreti.fr/mon-espace/" aria-label="Mon Espace Client">
-      <span class="qzs-espace-plaque" aria-hidden="true"><i></i><i></i><i></i><i class="o"></i></span>
-      <span class="qzs-espace-mot">Mon Espace</span>
-    </a>
+    <!-- 15/09 (Site & Boutique) — le bouton « Mon Espace » pose ici le 14 est RETIRE : « Mon Espace » est devenu une
+         rubrique du menu du site, que cette app reconstruit depuis la base — il y en avait donc deux cote a cote.
+         Un objet, une definition : la rubrique du menu, qui s inverse selon la barre qui la porte. -->
     <button type="button" class="qzs-burger" id="qzsBurger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="qzsNav"><span></span><span></span><span></span></button>
     <nav class="qzs-nav" id="qzsNav" aria-label="Menu principal du site">
       <ul id="qzsNavList">
