@@ -653,6 +653,30 @@
   .qzs-barre a.qzs-espace:hover, .qzs-barre a.qzs-espace:focus-visible{ background:#ffffff; color:#10181f !important; }
   @media (max-width:640px){ .qzs-barre a.qzs-espace{ display:none; } }
   /* ================= fin du bloc ================= */
+
+  /* ================= 18/09 : ce que le passage au navy laisse a relever =================
+     Les trois premiers textes vivent dans la colonne centrale, qui est TRANSPARENTE : ils etaient poses sur le
+     gris et se retrouvent sur le navy. Les autres etaient deja sous le seuil avant ce soir. */
+  .editeur > h1.titre-page{ color:#dedede; }                 /* etait le navy sur le navy : 1 */
+  .editeur > p.aide-page, .memoriser label{ color:#b6c0c8; } /* gris pense pour du clair : 2,41 -> 7,83 */
+
+  /* La pastille NOUVEAU : l orange ECRIT sur une teinte orange a 8 %, posee sur la carte navy 2, ne vaut que
+     2,65 — et sa forme claire n y monterait qu a 4,06, encore sous le seuil pour 8,5 px. Elle devient donc une
+     vraie pastille : fond orange plein, encre dessus. 5,23. Une pastille se lit mieux qu un mot teinte. */
+  .new-tag{ background:var(--terracotta); color:#10181f; }
+
+  /* La jauge de scannabilite : son vert etait pense pour un fond clair (3,89 sur le cadre sombre). Meme teinte,
+     eclaircie — sur un fond sombre on eclaircit en saturant. 5,96. Le SENS de la couleur ne change pas. */
+  .gauge-value{ color:var(--live-dot); }
+
+  /* L orange de marque en PETIT TEXTE sur du navy ne vaut que 4,23 : baseline de la barre et categorie du pied
+     prennent sa forme ecrite, #FF9147, meme teinte saturee a 100 %. 6,47. Defaut anterieur a ce soir. */
+  .qzs-app-base, .qzs-app-base .qzs-l, .qz-cat{ color:#ff9147 !important; }
+
+  /* Le copyright du pied : la feuille commune recopiee le 13/09 le peint en navy, et elle est lue APRES celle-ci.
+     A egalite on perd ; il faut etre PLUS PRECIS, pas plus insistant — trois classes contre une. */
+  footer.qz-footer .qz-pied-barre .qz-copy{ color:#b6c0c8; }
+  /* ================= fin du bloc ================= */
 </style>
 </head>
 <body>
