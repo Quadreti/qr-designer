@@ -64,7 +64,7 @@
      de page commun reste atteignable en defilant sous l'app, comme un vrai pied de page. */
   /* 18/09 : le FOND DE PAGE passe au navy, comme les 38 pages du site. Nomme ici et non via --fond : ce jeton-la porte
      le fond du QR et des champs de saisie, qui doivent rester clairs. Un QR sur navy ne se scanne pas. */
-  .shell{ width:100%; height:calc(100vh - var(--qzs-h-entete,0px)); height:calc(100dvh - var(--qzs-h-entete,0px)); margin:0; background:var(--site-navy); display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+  .shell{ width:100%; height:calc(100vh - var(--qzs-h-entete,0px)); height:calc(100dvh - var(--qzs-h-entete,0px)); margin:0; display:flex; flex-direction:column; overflow:hidden; min-width:0; }   /* 18/09 : le fond n est plus decide ici mais plus bas, a l endroit unique qui gagnait deja */
 
 
   .disposition{ display:grid; grid-template-columns:220px 1fr 340px; flex:1; min-height:0; min-width:0; }
@@ -497,9 +497,13 @@
     .qzs-barre{ min-height:58px; height:58px; }
   }
 
-  /* 3 et 4. Les colonnes laterales et les cartes en bleu Quadreti, la bande centrale en gris.
-     Les jetons redefinis ici cascadent sur tout le contenu de ces zones. */
-  .shell{ background:var(--fond); }
+  /* 3 et 4. Les colonnes laterales et les cartes en bleu Quadreti.
+     Les jetons redefinis ici cascadent sur tout le contenu de ces zones.
+     18/09 : la bande centrale n est plus grise — elle prend le navy comme le fond de toutes les pages du site.
+     CETTE LIGNE-CI decidait la couleur une SECONDE fois, apres celle de .shell posee plus haut, et gagnait par
+     l ordre. J avais corrige la premiere et rien ne bougeait. Une couleur se decide a UN endroit : c est donc
+     celle qui gagne qui est corrigee, pas une troisieme ajoutee par-dessus. */
+  .shell{ background:var(--site-navy); }
   /* 18/09, demande du fondateur : les deux VOLETS LATERAUX passent en NAVY 2. Les cartes suivent — sur un fond de page
      devenu navy, une carte navy se confondrait avec lui. 1,42 entre les deux : un panneau, pas une seconde surface
      lumineuse. Les jetons de texte etaient deja bascules ici, ils restent justes. */
