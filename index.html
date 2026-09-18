@@ -27,11 +27,17 @@
      plutôt qu'un fond plat comme pour le thème sombre précédent. Boutons en orange Quadreti
      #d96c2f (jetons --site-orange), inchangé. */
   :root{
-    --charbon:#2B353E; --creme:#F2EEDF; --terracotta:#d96c2f; --kraft:#d96c2f;
-    --fond:#dedede; --surface:#FFFFFF; --bord:#2b353e1c; --texte:#2B353E; --doux:#5c646c;
+    /* 18/09 : --charbon et --texte portaient #2B353E, l ANCIEN navy ; la charte dit #1E2B35. --creme portait le creme kraft,
+       abandonne. Les noms ne changent pas — les renommer par leur role toucherait chaque regle du fichier pour zero gain
+       visible. --fond NE BOUGE PAS : il porte le fond du QR et des champs, qui doivent rester clairs (voir l en-tete). */
+    --charbon:#1e2b35; --creme:#dedede; --terracotta:#d96c2f; --kraft:#d96c2f;
+    --fond:#dedede; --surface:#FFFFFF; --bord:#1e2b351c; --texte:#1e2b35; --doux:#5c646c;
     --teinte-actif:#d96c2f14; --live-dot:#4CAF6D; --slate:#4f7396; --slate-soft:#dee9f1;
     --red:#c0392b; --amber:#d99a2b; --green:#3f8a5a;
-    --sur-accent:#dedede; /* 13/09, demande du fondateur : tout ce qui est ecrit SUR l orange est en gris #dedede -- libelles,
+    --sur-accent:#10181f; /* 18/09, le fondateur revient sur sa decision du 13/09 : « cette regle change avec la nouvelle charte
+       graphique et design ». C etait du gris #dedede sur l orange — 2,54, sous le seuil, il l avait accepte en connaissance de cause.
+       L encre y donne 5,23, la paire utilisee par tout le site depuis le 17/09. Note d origine conservee ci-dessous pour la trace :
+       « tout ce qui est ecrit SUR l orange est en gris #dedede -- libelles,
        items du menu, onglets actifs et fleches de carrousel. Contraste mesure : 2,54, sous le minimum de 4,5 (et sous les 3,0 d un
        element graphique). Signale, tranche par lui. Pour garder ce gris en passant le seuil, il faudrait assombrir le bouton a
        #9c4514, qui donne 4,77. */ --scrim:#000000a0; --ombre-legere:#00000030; --ombre-forte:#00000060;
@@ -56,7 +62,9 @@
   /* Hauteur de l'en-tete commun du site (--qzs-h-entete) mesuree/posee en JS, soustraite ici :
      l'app garde son "pleine page, pas de double defilement" (demande fondateur 26/08), le pied
      de page commun reste atteignable en defilant sous l'app, comme un vrai pied de page. */
-  .shell{ width:100%; height:calc(100vh - var(--qzs-h-entete,0px)); height:calc(100dvh - var(--qzs-h-entete,0px)); margin:0; background:var(--surface); display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+  /* 18/09 : le FOND DE PAGE passe au navy, comme les 38 pages du site. Nomme ici et non via --fond : ce jeton-la porte
+     le fond du QR et des champs de saisie, qui doivent rester clairs. Un QR sur navy ne se scanne pas. */
+  .shell{ width:100%; height:calc(100vh - var(--qzs-h-entete,0px)); height:calc(100dvh - var(--qzs-h-entete,0px)); margin:0; background:var(--site-navy); display:flex; flex-direction:column; overflow:hidden; min-width:0; }
 
 
   .disposition{ display:grid; grid-template-columns:220px 1fr 340px; flex:1; min-height:0; min-width:0; }
@@ -396,6 +404,12 @@
   .qzs-cat{ font-family:'Jura',sans-serif; font-weight:700; font-size:14.5px; line-height:19.5px; letter-spacing:.02em; color:var(--site-orange); white-space:nowrap; }
   @media (max-width:640px){ .qzs-cat{ font-size:11px; } }
 
+  /* 18/09 : les regles ci-dessous sont devenues MORTES et gardees telles quelles, sans etre modifiees. Elles
+     habillaient la rubrique « Mon Espace » LA OU ELLE ETAIT, dans #qzsNavList. Avec le burger a toutes les
+     largeurs, cette rubrique est desormais SORTIE de ce conteneur vers la barre (voir le bloc en fin de feuille
+     et son script) : le selecteur ne l atteint plus. Je ne les efface pas — si le burger etait un jour retire,
+     elles reprendraient leur role d elles-memes. Une regle morte qui documente un etat anterieur vaut mieux
+     qu une suppression qu il faudrait retrouver. */
   /* ---- 15/09 (Site & Boutique) : « Mon Espace » dans la barre ----
      Le bouton pose en dur le 14 a ete retire (doublon avec la rubrique du menu). La rubrique prend son role et son aspect.
      LA REGLE, dite par le fondateur : « bouton bleu sur arriere-plan gris, bouton gris sur arriere-plan bleu ». Cette barre
@@ -486,9 +500,12 @@
   /* 3 et 4. Les colonnes laterales et les cartes en bleu Quadreti, la bande centrale en gris.
      Les jetons redefinis ici cascadent sur tout le contenu de ces zones. */
   .shell{ background:var(--fond); }
+  /* 18/09, demande du fondateur : les deux VOLETS LATERAUX passent en NAVY 2. Les cartes suivent — sur un fond de page
+     devenu navy, une carte navy se confondrait avec lui. 1,42 entre les deux : un panneau, pas une seconde surface
+     lumineuse. Les jetons de texte etaient deja bascules ici, ils restent justes. */
   nav.sommaire, .colonne-apercu, .carte{
-    background:var(--site-navy);
-    --surface:#1e2b35; --texte:#dedede; --doux:#dedede; --bord:#ffffff26;
+    background:#33434f;
+    --surface:#33434f; --texte:#dedede; --doux:#b6c0c8; --bord:#dedede26;
     color:#dedede;
   }
   nav.sommaire{ border-right-color:#ffffff26; }
@@ -544,6 +561,10 @@
   footer.qz-footer .qz-pied-fond{ fill:var(--site-navy); }
   /* Sans fond, la bande du decroche laisserait passer le gris de la page : c est exactement le parasite corrige plus haut. */
   .qz-pied-bord-haut{ overflow:hidden; background:var(--site-navy); }
+  /* 18/09, demande du fondateur : plus de marche en bas de page, et la barre du bas passe au navy comme le reste du pied. */
+  footer.qz-footer .qz-pied-bord-bas{ display:none; }
+  footer.qz-footer .qz-pied-barre{ background:var(--site-navy); }
+  footer.qz-footer .qz-pied-barre, footer.qz-footer .qz-pied-barre *{ color:#b6c0c8; }   /* 7,83 sur le navy ; l encre y valait 1,3 */
   .qz-pied-bord-haut > svg:not(.qz-pied-plat){ width:var(--qzs-col-gauche,220px); left:0; overflow:hidden; }
   .qz-pied-bord-haut > svg.qz-pied-plat{ left:var(--qzs-col-gauche,220px); width:calc(100% - var(--qzs-col-gauche,220px)); }
 
@@ -594,6 +615,40 @@
     animation-delay:calc(var(--qzs-tab) + var(--i) * var(--qz-lc)); }
   /* Sans la classe .qzs-anime, rien n est masque : une app ouverte une seconde fois dans la session affiche son logo, elle ne le rejoue pas. */
   @media (prefers-reduced-motion:reduce){ .qzs-plaque i, .qzs-app-nom .qzs-l, .qzs-app-base .qzs-l{ animation:none!important; opacity:1 } }
+
+  /* ================= 18/09 : LE MENU EN BURGER A TOUTES LES LARGEURS, comme l accueil =================
+     Le bouton existait deja mais ne sortait que sous 900 px. Les valeurs du tiroir sont RELEVEES sur celui de
+     l accueil en ligne, pas devinees : panneau navy de 320 px, coins 0 0 4px 4px, ombre 0 12px 30px rgba(0,0,0,.35),
+     liens #ff9147 a 13,5 px.
+     LE TIROIR OUVRE PAR `display`, PAS PAR UNE HAUTEUR. La version telephone utilisait un max-height a 80vh :
+     une hauteur devinee coupe le menu le jour ou une rubrique s ajoute, et c est exactement le piege qui a coute
+     deux pannes sur le site le 17/09. Les regles de la bande telephone sont donc neutralisees ici. */
+  .qzs-burger{ display:flex !important; width:42px; height:42px; border-radius:22%; background:#1e2b35; }
+  .qzs-burger span{ width:18px; height:2px; background:#dedede; }
+  .qzs-nav{
+    position:absolute; top:calc(100% + 6px); right:12px; left:auto; bottom:auto;
+    width:320px; max-width:calc(100vw - 32px); max-height:none; overflow:visible;
+    background:#1e2b35; border-radius:0 0 4px 4px; box-shadow:0 12px 30px rgba(0,0,0,.35);
+    display:none; z-index:600; transition:none;
+  }
+  .qzs-nav.open{ display:block; }
+  .qzs-nav > ul{ flex-direction:column; align-items:stretch; gap:0; padding:10px 0; flex-wrap:nowrap; }
+  .qzs-nav a, .qzs-nav .qzs-subtoggle{ width:100%; text-align:left; padding:10px 18px; font-size:13.5px; color:#ff9147; }
+  .qzs-nav a:hover, .qzs-nav .qzs-subtoggle:hover{ color:#ffa366; }
+  .qzs-sublist{ position:static; background:transparent !important; border:none; box-shadow:none; padding:0 0 0 14px; }
+  .qzs-sublist a{ color:#dedede !important; }
+  .qzs-sublist a:hover{ color:#ffa366 !important; }
+
+  /* « Mon Espace » reste DANS LA BARRE, a cote du burger : c est une porte, pas une rubrique. Le script plus bas
+     la sort du tiroir ; ici son allure, relevee sur l accueil. La rubrique est DEPLACEE, jamais dupliquee. */
+  .qzs-barre a.qzs-espace{
+    font-family:'Jura',sans-serif; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;
+    line-height:1.2; text-decoration:none; white-space:nowrap; flex:none; align-self:center;
+    background:#dedede; color:#10181f !important; border-radius:4px; padding:7px 15px; margin-left:auto; margin-right:10px;
+  }
+  .qzs-barre a.qzs-espace:hover, .qzs-barre a.qzs-espace:focus-visible{ background:#ffffff; color:#10181f !important; }
+  @media (max-width:640px){ .qzs-barre a.qzs-espace{ display:none; } }
+  /* ================= fin du bloc ================= */
 </style>
 </head>
 <body>
@@ -1875,6 +1930,28 @@ $('btnTelecharger').addEventListener('click', function(){
 
   /* Burger + sous-menu (mobile, meme comportement que le site) */
   var burger = document.getElementById('qzsBurger'), nav = document.getElementById('qzsNav'), voile = document.getElementById('qzsVoile');
+  /* 18/09 : « Mon Espace » sort du tiroir pour rester dans la barre. Impossible en CSS — le tiroir est en
+     display:none quand il est ferme, et aucun enfant d un element masque ne peut etre reaffiche.
+     PIEGE : le menu est reconstruit depuis Supabase. Un lien deplace une fois y reviendrait, et on en aurait
+     deux. L extraction se rejoue par un observateur a chaque changement de la liste, et supprime les doublons. */
+  (function(){
+    if (!burger || !nav) return;
+    var barre = burger.parentElement; if (!barre) return;
+    function sortirMonEspace(){
+      var dehors = barre.querySelector(":scope > a.qzs-espace");
+      var dedans = nav.querySelectorAll('a[href*="/mon-espace/"]');
+      for (var i = 0; i < dedans.length; i++){
+        var a = dedans[i], li = a.closest("li");
+        if (dehors) { if (li) li.remove(); else a.remove(); continue; }
+        a.className = (a.className ? a.className + " " : "") + "qzs-espace";
+        barre.insertBefore(a, burger);
+        if (li) li.remove();
+        dehors = a;
+      }
+    }
+    sortirMonEspace();
+    if (window.MutationObserver) new MutationObserver(sortirMonEspace).observe(nav, { childList:true, subtree:true });
+  })();
   function basculerMenu(ouvrir){
     nav.classList.toggle('open', ouvrir);
     voile.classList.toggle('open', ouvrir);
