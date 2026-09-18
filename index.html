@@ -33,7 +33,12 @@
     --charbon:#1e2b35; --creme:#dedede; --terracotta:#d96c2f; --kraft:#d96c2f;
     --fond:#dedede; --surface:#FFFFFF; --bord:#1e2b351c; --texte:#1e2b35; --doux:#5c646c;
     --teinte-actif:#d96c2f14; --live-dot:#4CAF6D; --slate:#4f7396; --slate-soft:#dee9f1;
-    --red:#c0392b; --amber:#d99a2b; --green:#3f8a5a;
+    /* 18/09 : ces trois couleurs sont posees par le SCRIPT en style inline (val.style.color = var(--green)) —
+       aucune regle CSS ne peut gagner contre un style inline, il faut donc corriger les JETONS eux-memes.
+       Elles etaient pensees pour un fond clair ; sur le cadre sombre de la jauge, le vert tombait a 3,89 et le
+       rouge a 3,01. Eclaircis en gardant leur teinte et donc leur SENS : 5,96 et 5,84. L ambre passait deja (6,70).
+       Le bloc [data-theme="light"] plus bas garde les valeurs d origine : elles y sont justes. */
+    --red:#ff6b5a; --amber:#d99a2b; --green:#4CAF6D;
     --sur-accent:#10181f; /* 18/09, le fondateur revient sur sa decision du 13/09 : « cette regle change avec la nouvelle charte
        graphique et design ». C etait du gris #dedede sur l orange — 2,54, sous le seuil, il l avait accepte en connaissance de cause.
        L encre y donne 5,23, la paire utilisee par tout le site depuis le 17/09. Note d origine conservee ci-dessous pour la trace :
@@ -667,7 +672,7 @@
 
   /* La jauge de scannabilite : son vert etait pense pour un fond clair (3,89 sur le cadre sombre). Meme teinte,
      eclaircie — sur un fond sombre on eclaircit en saturant. 5,96. Le SENS de la couleur ne change pas. */
-  .gauge-value{ color:var(--live-dot); }
+  /* (regle retiree : le script pose la couleur en style inline, elle ne s appliquait jamais.) */
 
   /* L orange de marque en PETIT TEXTE sur du navy ne vaut que 4,23 : baseline de la barre et categorie du pied
      prennent sa forme ecrite, #FF9147, meme teinte saturee a 100 %. 6,47. Defaut anterieur a ce soir. */
