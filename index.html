@@ -668,7 +668,11 @@
      depuis la base. Plutot que de toucher aux deux, le bouton devient une boite flex en ordre INVERSE : l ordre
      du code ne bouge pas, seul l affichage change. En ordre inverse le depart est a droite, donc `flex-start`
      colle bien le groupe au bord droit — c est le piege de row-reverse, on l ecrit pour ne pas le reperdre. */
-  .qzs-nav a, .qzs-nav .qzs-subtoggle{ width:100%; text-align:right; padding:10px 18px; font-size:13.5px; color:#ff9147; }
+  /* 19/09 : `display:block` est ce qui manquait. Un lien est EN LIGNE par defaut : ni `width:100%` ni
+     `text-align` ne l atteignent — seules les rubriques a sous-menu s alignaient, parce que ce sont des BOUTONS.
+     C est aussi ce qui resserrait « Boutique » et « Studio » : sans boite de bloc, leurs retraits verticaux ne
+     creaient aucun espace entre eux. Une seule declaration repare l alignement ET l espacement. */
+  .qzs-nav a, .qzs-nav .qzs-subtoggle{ display:block; width:100%; text-align:right; padding:10px 18px; font-size:13.5px; color:#ff9147; }
   .qzs-nav .qzs-subtoggle{
     display:flex; flex-direction:row-reverse; justify-content:flex-start; align-items:center; gap:8px;
   }
