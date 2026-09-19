@@ -133,7 +133,7 @@ footer.qz-footer{
    lisere, copyright centre dans une barre grise (les boutons flottants occupent les cotes). Le navy vient du panneau ("Fond bandeau &
    pied de page", reglages-site.js) ; la barre grise, les titres et le lisere sont les jetons ci-dessous. Les regles prefixees
    footer.qz-footer passent devant les couleurs injectees par le panneau (meme classe, specificite superieure). ===== */
-:root{--qz-encre:#10181f;--qz-pied-barre:#dedede;--qz-pied-barre-texte:#1e2b35;--qz-pied-titre:#dedede;--qz-lisere:var(--qz-terracotta,#d96c2f);--qz-lisere-ep:3px;--qz-pied-decroche:22px}
+:root{--qz-encre:#10181f;--qz-pied-barre:#dedede;--qz-pied-barre-texte:#1e2b35;--qz-pied-titre:#dedede;--qz-lisere:#dedede;--qz-lisere-ep:2px;/* 19/09, fondateur : le lisere du pied etait reste orange a 3 px. Gris a 2 px, comme en haut et comme tout le site. Corrige ICI, dans la copie locale de la feuille commune que ce depot embarque depuis le 13/09 — pas en surcouche dans la page. */--qz-pied-decroche:22px}
 .qz-pied3{
   width:100%; background:#1e2b35; box-sizing:border-box;
   padding:30px 36px 38px;

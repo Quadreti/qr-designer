@@ -353,7 +353,9 @@
   .qzs-entete{ position:relative; background:var(--site-navy); }
   .qzs-onglet{ position:absolute; left:0; top:0; width:100%; height:98px; z-index:0; display:block; overflow:visible; pointer-events:none; }
   .qzs-onglet-fond{ fill:var(--site-navy); }
-  .qzs-onglet-trait{ fill:none; stroke:var(--site-orange); stroke-width:3px; stroke-linejoin:round; stroke-linecap:round; }
+  /* 19/09, fondateur : le lisere du decroche etait reste ORANGE a 3 px. Il prend le gris #dedede a 2 px, la
+     meme epaisseur que le bandeau de l accueil et que les 38 pages du site. */
+  .qzs-onglet-trait{ fill:none; stroke:#dedede; stroke-width:2px; stroke-linejoin:round; stroke-linecap:round; }
   @media (max-width:900px){ .qzs-onglet{ display:none; } }
 
   /* Pas de z-index ici : ca creerait un contexte d'empilement qui pieegerait le menu mobile
@@ -508,13 +510,17 @@
      CETTE LIGNE-CI decidait la couleur une SECONDE fois, apres celle de .shell posee plus haut, et gagnait par
      l ordre. J avais corrige la premiere et rien ne bougeait. Une couleur se decide a UN endroit : c est donc
      celle qui gagne qui est corrigee, pas une troisieme ajoutee par-dessus. */
-  .shell{ background:var(--site-navy); }
+  /* 19/09, fondateur : LES DEUX NAVYS SONT INVERSES. Le plan de travail central prend le navy 2, les volets et
+     les cartes reprennent le navy de marque. C est la lecture inverse de celle du site — la ou une page pose des
+     cartes CLAIRES sur un fond sombre, un atelier pose des panneaux SOMBRES sur un plan plus clair : ce qui
+     compte y est l outil, pas la page. */
+  .shell{ background:#33434f; }
   /* 18/09, demande du fondateur : les deux VOLETS LATERAUX passent en NAVY 2. Les cartes suivent — sur un fond de page
      devenu navy, une carte navy se confondrait avec lui. 1,42 entre les deux : un panneau, pas une seconde surface
      lumineuse. Les jetons de texte etaient deja bascules ici, ils restent justes. */
   nav.sommaire, .colonne-apercu, .carte{
-    background:#33434f;
-    --surface:#33434f; --texte:#dedede; --doux:#b6c0c8; --bord:#dedede26;
+    background:var(--site-navy);
+    --surface:#1e2b35; --texte:#dedede; --doux:#b6c0c8; --bord:#dedede26;
     color:#dedede;
   }
   nav.sommaire{ border-right-color:#ffffff26; }
