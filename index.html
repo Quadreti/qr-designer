@@ -647,6 +647,11 @@
     position:absolute; top:calc(100% + 6px); right:12px; left:auto; bottom:auto;
     width:320px; max-width:calc(100vw - 32px); max-height:none; overflow:visible;
     background:#1e2b35; border-radius:0 0 4px 4px; box-shadow:0 12px 30px rgba(0,0,0,.35);
+    /* 19/09 : un filet gris, ajoute apres l inversion des navys. Le tiroir est navy 1 — et depuis l inversion la
+       colonne d apercu qu il recouvre l est aussi : sans bord, un panneau flottant posé sur sa propre couleur ne
+       se voit plus. Une ombre ne suffit pas entre deux surfaces identiques. Le filet, lui, tient quel que soit ce
+       qu il y a derriere — et c est la meme grammaire que les liseres du site. */
+    border:1px solid #dedede40;
     display:none; z-index:600; transition:none;
   }
   .qzs-nav.open{ display:block; }
