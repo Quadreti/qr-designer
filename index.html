@@ -651,7 +651,19 @@
   }
   .qzs-nav.open{ display:block; }
   .qzs-nav > ul{ flex-direction:column; align-items:stretch; gap:0; padding:10px 0; flex-wrap:nowrap; }
-  .qzs-nav a, .qzs-nav .qzs-subtoggle{ width:100%; text-align:left; padding:10px 18px; font-size:13.5px; color:#ff9147; }
+  /* 19/09, fondateur : les rubriques du tiroir sont alignees A DROITE, et le chevron des sous-menus passe A
+     GAUCHE de son libelle.
+     Le chevron est un <span> ecrit APRES le libelle, dans le balisage ET dans le script qui reconstruit le menu
+     depuis la base. Plutot que de toucher aux deux, le bouton devient une boite flex en ordre INVERSE : l ordre
+     du code ne bouge pas, seul l affichage change. En ordre inverse le depart est a droite, donc `flex-start`
+     colle bien le groupe au bord droit — c est le piege de row-reverse, on l ecrit pour ne pas le reperdre. */
+  .qzs-nav a, .qzs-nav .qzs-subtoggle{ width:100%; text-align:right; padding:10px 18px; font-size:13.5px; color:#ff9147; }
+  .qzs-nav .qzs-subtoggle{
+    display:flex; flex-direction:row-reverse; justify-content:flex-start; align-items:center; gap:8px;
+  }
+  /* Les sous-rubriques suivent leur rubrique : un sous-menu aligne a gauche sous un menu aligne a droite
+     donnerait deux axes de lecture dans le meme tiroir. */
+  .qzs-sublist a{ text-align:right; }
   .qzs-nav a:hover, .qzs-nav .qzs-subtoggle:hover{ color:#ffa366; }
   .qzs-sublist{ position:static; background:transparent !important; border:none; box-shadow:none; padding:0 0 0 14px; }
   .qzs-sublist a{ color:#dedede !important; }
